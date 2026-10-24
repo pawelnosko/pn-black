@@ -1,0 +1,91 @@
+{#
+  Theme Black
+  Author: Paweł Nosko → https://pawelnosko.com/
+  Company: Design Cart → https://www.designcart.pl/
+#}
+{% macro language_pill(language, panel_id, active) %}
+  <button type="button" class="dc-lang-pill dc-tabs__btn{% if active %} dc-active{% endif %}" data-dc-lang="{{ panel_id }}">
+    {% if language.image %}
+      <img src="{{ language.image }}" alt="" title="{{ language.name }}" class="dc-lang-pill__flag" width="16" height="11" loading="lazy"/>
+    {% endif %}
+    <span class="dc-lang-pill__name">{{ language.name }}</span>
+  </button>
+{% endmacro %}
+
+{% macro image_manager(name, value, thumb, placeholder, id_prefix, field_name) %}
+  {% set uid = id_prefix|default(name|replace({'[': '-', ']': '', '.': '-'}) ) %}
+  {% set input_name = field_name|default('module_pn_black[' ~ name ~ ']') %}
+  <div class="dc-image-manager">
+    <div class="dc-image-manager__preview">
+      <img src="{{ thumb|default(placeholder) }}" alt="" title="" id="thumb-{{ uid }}" data-oc-placeholder="{{ placeholder }}" class="img-thumbnail dc-image-thumb"/>
+    </div>
+    <input type="hidden" name="{{ input_name }}" value="{{ value|default('') }}" id="input-{{ uid }}"/>
+    <div class="dc-image-manager__actions">
+      <button type="button" data-oc-toggle="image" data-oc-target="#input-{{ uid }}" data-oc-thumb="#thumb-{{ uid }}" class="dc-btn dc-btn--light dc-btn--sm"><i class="fa fa-pencil"></i> {{ button_edit|default('Edit') }}</button>
+      <button type="button" data-oc-toggle="clear" data-oc-target="#input-{{ uid }}" data-oc-thumb="#thumb-{{ uid }}" class="dc-btn dc-btn--ghost dc-btn--sm"><i class="fa fa-trash"></i> {{ button_clear|default('Clear') }}</button>
+    </div>
+  </div>
+{% endmacro %}
+
+{% macro multilang_fields(prefix, fields, settings, languages, section_id) %}
+  <div class="dc-lang-pills">
+    {% for language in languages %}
+      {{ _self.language_pill(language, 'lang-' ~ section_id ~ '-' ~ language.language_id, loop.first) }}
+    {% endfor %}
+  </div>
+  {% for language in languages %}
+    <div class="dc-lang-panel{% if loop.first %} dc-active{% endif %}" id="lang-{{ section_id }}-{{ language.language_id }}">
+      {% for field in fields %}
+        <div class="dc-field">
+          <label class="dc-label" for="input-{{ section_id }}-{{ field.key }}-{{ language.language_id }}">{{ field.label }}</label>
+          {% if field.type == 'textarea' %}
+            <textarea class="dc-input{% if field.summernote %} dc-summernote-lite{% endif %}" rows="{{ field.rows|default(4) }}" name="module_pn_black{% if prefix %}[{{ prefix }}]{% endif %}[{{ field.key }}][{{ language.language_id }}]" id="input-{{ section_id }}-{{ field.key }}-{{ language.language_id }}">{{ settings[field.key][language.language_id]|default('') }}</textarea>
+          {% else %}
+            <input class="dc-input" type="{{ field.type|default('text') }}" name="module_pn_black{% if prefix %}[{{ prefix }}]{% endif %}[{{ field.key }}][{{ language.language_id }}]" value="{{ settings[field.key][language.language_id]|default('') }}" id="input-{{ section_id }}-{{ field.key }}-{{ language.language_id }}"{% if field.placeholder %} placeholder="{{ field.placeholder }}"{% endif %}/>
+          {% endif %}
+        </div>
+      {% endfor %}
+    </div>
+  {% endfor %}
+{% endmacro %}
+
+{% macro multilang_simple(name, label, values, languages, section_id, type) %}
+  <div class="dc-section-card dc-section">
+    <div class="dc-section-card__head">
+      <span class="dc-section-card__icon"><i class="fa fa-language"></i></span>
+      <div><h3 class="dc-section-card__title">{{ label }}</h3></div>
+    </div>
+    <div class="dc-lang-pills">
+      {% for language in languages %}
+        {{ _self.language_pill(language, 'lang-' ~ section_id ~ '-' ~ language.language_id, loop.first) }}
+      {% endfor %}
+    </div>
+    {% for language in languages %}
+      <div class="dc-lang-panel{% if loop.first %} dc-active{% endif %}" id="lang-{{ section_id }}-{{ language.language_id }}">
+        <div class="dc-field">
+          <label class="dc-label" for="input-{{ section_id }}-{{ language.language_id }}">{{ label }}</label>
+          {% if type == 'textarea' %}
+            <textarea class="dc-input" rows="4" name="module_pn_black[{{ name }}][{{ language.language_id }}]" id="input-{{ section_id }}-{{ language.language_id }}">{{ values[language.language_id]|default('') }}</textarea>
+          {% else %}
+            <input class="dc-input" type="text" name="module_pn_black[{{ name }}][{{ language.language_id }}]" value="{{ values[language.language_id]|default('') }}" id="input-{{ section_id }}-{{ language.language_id }}"/>
+          {% endif %}
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+{% endmacro %}
+
+{% macro emoji_picker(name, value, emoji_source, id_prefix) %}
+  {% set uid = id_prefix|default(name|replace({'[': '-', ']': '', '.': '-'}) ) %}
+  {% set field_name = (name|slice(0, 1) == '[') ? 'module_pn_black' ~ name : 'module_pn_black[' ~ name ~ ']' %}
+  <div class="dc-field dc-emoji-field">
+    <label class="dc-label">{{ entry_icon }}</label>
+    <div class="dc-emoji-picker-wrap">
+      <button type="button" class="dc-btn dc-btn--ghost dc-emoji-trigger" data-emoji-target="#input-{{ uid }}" data-emoji-preview="#preview-{{ uid }}" data-emoji-source="{{ emoji_source|default('list') }}">
+        <span class="dc-emoji-preview" id="preview-{{ uid }}">{{ value|default('😀') }}</span>
+        <span>{{ entry_icon }}</span>
+      </button>
+      <input type="hidden" name="{{ field_name }}" value="{{ value|default('') }}" id="input-{{ uid }}"/>
+    </div>
+  </div>
+{% endmacro %}

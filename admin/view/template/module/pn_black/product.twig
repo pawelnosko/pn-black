@@ -1,0 +1,44 @@
+{#
+  Theme Black
+  Author: Paweł Nosko → https://pawelnosko.com/
+  Company: Design Cart → https://www.designcart.pl/
+#}
+{% import 'extension/pn_black/admin/view/template/module/pn_black/_macros.twig' as dc %}
+{% include 'extension/pn_black/admin/view/template/module/pn_black/_layout_start.twig' %}
+
+<div class="dc-section-card dc-section">
+  <div class="dc-section-card__head">
+    <span class="dc-section-card__icon"><i class="fa fa-cube"></i></span>
+    <div><h3 class="dc-section-card__title">{{ section_product }}</h3></div>
+  </div>
+
+  {% set features = settings.features|default([]) %}
+  {% for feature in features %}
+    {% set fidx = loop.index0 %}
+    <div class="dc-subsection">
+      <h4 class="dc-subsection__title">{{ entry_feature_title }} {{ loop.index }}</h4>
+      {{ dc.emoji_picker('[features][' ~ fidx ~ '][icon]', feature.icon|default('✓'), 'list', 'product-feature-icon-' ~ fidx) }}
+      <div class="dc-lang-pills">
+        {% for language in languages %}
+          {{ dc.language_pill(language, 'lang-product-feature-' ~ fidx ~ '-' ~ language.language_id, loop.first) }}
+        {% endfor %}
+      </div>
+      {% for language in languages %}
+        <div class="dc-lang-panel{% if loop.first %} dc-active{% endif %}" id="lang-product-feature-{{ fidx }}-{{ language.language_id }}">
+          <div class="dc-row dc-row--2">
+            <div class="dc-field">
+              <label class="dc-label">{{ entry_feature_title }}</label>
+              <input class="dc-input" type="text" name="module_pn_black[features][{{ fidx }}][title][{{ language.language_id }}]" value="{{ feature.title[language.language_id]|default('') }}"/>
+            </div>
+            <div class="dc-field">
+              <label class="dc-label">{{ entry_feature_text }}</label>
+              <input class="dc-input" type="text" name="module_pn_black[features][{{ fidx }}][text][{{ language.language_id }}]" value="{{ feature.text[language.language_id]|default('') }}"/>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% endfor %}
+</div>
+
+{% include 'extension/pn_black/admin/view/template/module/pn_black/_layout_end.twig' %}

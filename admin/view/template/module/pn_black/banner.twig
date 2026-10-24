@@ -1,0 +1,188 @@
+{#
+  Theme Black
+  Author: Paweł Nosko → https://pawelnosko.com/
+  Company: Design Cart → https://www.designcart.pl/
+#}
+{% import 'extension/pn_black/admin/view/template/module/pn_black/_macros.twig' as dc %}
+{% include 'extension/pn_black/admin/view/template/module/pn_black/_layout_start.twig' %}
+
+<div class="dc-section-card dc-section">
+  <div class="dc-section-card__head">
+    <span class="dc-section-card__icon"><i class="fa fa-images"></i></span>
+    <div>
+      <h3 class="dc-section-card__title">{{ section_banner }}</h3>
+      <p class="dc-section-card__sub">{{ help_banner_cycle }}</p>
+    </div>
+    <div class="dc-section-card__actions">
+      <button type="button" class="dc-btn dc-btn--light" data-dc-add-item="slides" data-dc-template="slide-template"><i class="fa fa-plus"></i> {{ text_add_slide }}</button>
+    </div>
+  </div>
+
+  <div class="dc-accordion dc-accordion--sortable" id="slides-accordion" data-dc-accordion-list="slides" data-dc-reindex="module_pn_black[slides]">
+    {% set slides = settings.slides|default([]) %}
+    {% for slide in slides %}
+      {% set idx = loop.index0 %}
+      {% set slide_thumb = slide_thumbs[idx]|default(placeholder) %}
+      {% set slide_title = slide.title[languages[0].language_id]|default('Slide ' ~ (idx + 1)) %}
+      <div class="dc-accordion__item{% if loop.first %} dc-open{% endif %}" data-dc-accordion-item data-dc-index="{{ idx }}">
+        <div class="dc-accordion__header-row">
+          <span class="dc-sort-handle dc-accordion__handle" title="{{ text_drag }}"><i class="fa fa-bars"></i></span>
+          <button type="button" class="dc-accordion__trigger" data-dc-accordion-trigger aria-expanded="{{ loop.first ? 'true' : 'false' }}">
+            <span class="dc-accordion__icon">🖼️</span>
+            <span class="dc-accordion__title">
+              {{ slide_title }}
+              <span class="dc-accordion__sub">{{ entry_title }}</span>
+            </span>
+            <svg class="dc-accordion__chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <button type="button" class="dc-btn dc-btn--ghost dc-btn--danger" data-dc-remove-item title="Remove"><i class="fa fa-trash"></i></button>
+        </div>
+        <div class="dc-accordion__panel">
+          <div class="dc-accordion__content">
+            <div class="dc-accordion__body">
+              <div class="dc-lang-pills">
+                {% for language in languages %}
+                  {{ dc.language_pill(language, 'lang-slide-' ~ idx ~ '-' ~ language.language_id, loop.first) }}
+                {% endfor %}
+              </div>
+              {% for language in languages %}
+                <div class="dc-lang-panel{% if loop.first %} dc-active{% endif %}" id="lang-slide-{{ idx }}-{{ language.language_id }}">
+                  <div class="dc-row dc-row--2">
+                    <div class="dc-field">
+                      <label class="dc-label">{{ entry_badge }}</label>
+                      <input class="dc-input" type="text" name="module_pn_black[slides][{{ idx }}][badge][{{ language.language_id }}]" value="{{ slide.badge[language.language_id]|default('') }}"/>
+                    </div>
+                    <div class="dc-field">
+                      <label class="dc-label">{{ entry_image_badge }}</label>
+                      <input class="dc-input" type="text" name="module_pn_black[slides][{{ idx }}][image_badge][{{ language.language_id }}]" value="{{ slide.image_badge[language.language_id]|default('') }}"/>
+                    </div>
+                  </div>
+                  <div class="dc-row dc-row--2">
+                    <div class="dc-field">
+                      <label class="dc-label">{{ entry_title }}</label>
+                      <input class="dc-input" type="text" name="module_pn_black[slides][{{ idx }}][title][{{ language.language_id }}]" value="{{ slide.title[language.language_id]|default('') }}" data-dc-slide-title/>
+                    </div>
+                    <div class="dc-field">
+                      <label class="dc-label">{{ entry_title_accent }}</label>
+                      <input class="dc-input" type="text" name="module_pn_black[slides][{{ idx }}][title_accent][{{ language.language_id }}]" value="{{ slide.title_accent[language.language_id]|default('') }}"/>
+                    </div>
+                  </div>
+                  <div class="dc-field">
+                    <label class="dc-label">{{ entry_description }}</label>
+                    <textarea class="dc-input" rows="3" name="module_pn_black[slides][{{ idx }}][description][{{ language.language_id }}]">{{ slide.description[language.language_id]|default('') }}</textarea>
+                  </div>
+                  <div class="dc-row dc-row--2">
+                    <div class="dc-field">
+                      <label class="dc-label">{{ entry_cta1 }}</label>
+                      <input class="dc-input" type="text" name="module_pn_black[slides][{{ idx }}][cta1][{{ language.language_id }}]" value="{{ slide.cta1[language.language_id]|default('') }}"/>
+                    </div>
+                    <div class="dc-field">
+                      <label class="dc-label">{{ entry_cta2 }}</label>
+                      <input class="dc-input" type="text" name="module_pn_black[slides][{{ idx }}][cta2][{{ language.language_id }}]" value="{{ slide.cta2[language.language_id]|default('') }}"/>
+                    </div>
+                  </div>
+                </div>
+              {% endfor %}
+              <div class="dc-row dc-row--2">
+                <div class="dc-field">
+                  <label class="dc-label">{{ entry_cta1_link }}</label>
+                  <input class="dc-input" type="text" name="module_pn_black[slides][{{ idx }}][cta1_link]" value="{{ slide.cta1_link|default('') }}"/>
+                </div>
+                <div class="dc-field">
+                  <label class="dc-label">{{ entry_cta2_link }}</label>
+                  <input class="dc-input" type="text" name="module_pn_black[slides][{{ idx }}][cta2_link]" value="{{ slide.cta2_link|default('') }}"/>
+                </div>
+              </div>
+              <div class="dc-field">
+                <label class="dc-label">{{ entry_image }}</label>
+                {{ dc.image_manager('slide-image-' ~ idx, slide.image|default(''), slide_thumb, placeholder, 'slide-' ~ idx ~ '-image', 'module_pn_black[slides][' ~ idx ~ '][image]') }}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+</div>
+
+<template id="slide-template">
+  <div class="dc-accordion__item dc-open" data-dc-accordion-item data-dc-index="__INDEX__">
+    <div class="dc-accordion__header-row">
+      <span class="dc-sort-handle dc-accordion__handle" title="{{ text_drag }}"><i class="fa fa-bars"></i></span>
+      <button type="button" class="dc-accordion__trigger" data-dc-accordion-trigger aria-expanded="true">
+        <span class="dc-accordion__icon">🖼️</span>
+        <span class="dc-accordion__title">
+          New slide
+          <span class="dc-accordion__sub">{{ entry_title }}</span>
+        </span>
+        <svg class="dc-accordion__chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <button type="button" class="dc-btn dc-btn--ghost dc-btn--danger" data-dc-remove-item title="Remove"><i class="fa fa-trash"></i></button>
+    </div>
+    <div class="dc-accordion__panel">
+      <div class="dc-accordion__content">
+        <div class="dc-accordion__body">
+          <div class="dc-lang-pills">
+            {% for language in languages %}
+              {{ dc.language_pill(language, 'lang-slide-__INDEX__-' ~ language.language_id, loop.first) }}
+            {% endfor %}
+          </div>
+          {% for language in languages %}
+            <div class="dc-lang-panel{% if loop.first %} dc-active{% endif %}" id="lang-slide-__INDEX__-{{ language.language_id }}">
+              <div class="dc-row dc-row--2">
+                <div class="dc-field">
+                  <label class="dc-label">{{ entry_badge }}</label>
+                  <input class="dc-input" type="text" name="module_pn_black[slides][__INDEX__][badge][{{ language.language_id }}]" value=""/>
+                </div>
+                <div class="dc-field">
+                  <label class="dc-label">{{ entry_image_badge }}</label>
+                  <input class="dc-input" type="text" name="module_pn_black[slides][__INDEX__][image_badge][{{ language.language_id }}]" value=""/>
+                </div>
+              </div>
+              <div class="dc-row dc-row--2">
+                <div class="dc-field">
+                  <label class="dc-label">{{ entry_title }}</label>
+                  <input class="dc-input" type="text" name="module_pn_black[slides][__INDEX__][title][{{ language.language_id }}]" value="" data-dc-slide-title/>
+                </div>
+                <div class="dc-field">
+                  <label class="dc-label">{{ entry_title_accent }}</label>
+                  <input class="dc-input" type="text" name="module_pn_black[slides][__INDEX__][title_accent][{{ language.language_id }}]" value=""/>
+                </div>
+              </div>
+              <div class="dc-field">
+                <label class="dc-label">{{ entry_description }}</label>
+                <textarea class="dc-input" rows="3" name="module_pn_black[slides][__INDEX__][description][{{ language.language_id }}]"></textarea>
+              </div>
+              <div class="dc-row dc-row--2">
+                <div class="dc-field">
+                  <label class="dc-label">{{ entry_cta1 }}</label>
+                  <input class="dc-input" type="text" name="module_pn_black[slides][__INDEX__][cta1][{{ language.language_id }}]" value=""/>
+                </div>
+                <div class="dc-field">
+                  <label class="dc-label">{{ entry_cta2 }}</label>
+                  <input class="dc-input" type="text" name="module_pn_black[slides][__INDEX__][cta2][{{ language.language_id }}]" value=""/>
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+          <div class="dc-row dc-row--2">
+            <div class="dc-field">
+              <label class="dc-label">{{ entry_cta1_link }}</label>
+              <input class="dc-input" type="text" name="module_pn_black[slides][__INDEX__][cta1_link]" value=""/>
+            </div>
+            <div class="dc-field">
+              <label class="dc-label">{{ entry_cta2_link }}</label>
+              <input class="dc-input" type="text" name="module_pn_black[slides][__INDEX__][cta2_link]" value=""/>
+            </div>
+          </div>
+          <div class="dc-field">
+            <label class="dc-label">{{ entry_image }}</label>
+            {{ dc.image_manager('slide-image-__INDEX__', '', placeholder, placeholder, 'slide-__INDEX__-image', 'module_pn_black[slides][__INDEX__][image]') }}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+{% include 'extension/pn_black/admin/view/template/module/pn_black/_layout_end.twig' %}

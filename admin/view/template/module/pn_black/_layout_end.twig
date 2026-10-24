@@ -1,0 +1,31 @@
+{#
+  Theme Black
+  Author: Paweł Nosko → https://pawelnosko.com/
+  Company: Design Cart → https://www.designcart.pl/
+#}
+</div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="dc-emoji-modal" id="dcEmojiModal" hidden>
+  <div class="dc-emoji-modal__backdrop" data-emoji-close></div>
+  <div class="dc-emoji-modal__dialog" role="dialog" aria-modal="true" aria-labelledby="dcEmojiModalTitle">
+    <div class="dc-emoji-modal__head">
+      <h3 id="dcEmojiModalTitle">{{ entry_icon }}</h3>
+      <button type="button" class="dc-btn dc-btn--ghost" data-emoji-close aria-label="Close"><i class="fa fa-times"></i></button>
+    </div>
+    <div class="dc-emoji-modal__grid" id="dcEmojiGrid"></div>
+  </div>
+</div>
+
+{% if emoji_list is defined %}
+<script type="application/json" id="dc-emoji-list">{{ emoji_list|json_encode|raw }}</script>
+{% endif %}
+{% if emoji_people is defined %}
+<script type="application/json" id="dc-emoji-people">{{ emoji_people|json_encode|raw }}</script>
+{% endif %}
+
+{{ footer }}

@@ -1,0 +1,327 @@
+{#
+  Theme Black
+  Author: Paweł Nosko → https://pawelnosko.com/
+  Company: Design Cart → https://www.designcart.pl/
+#}
+{% import 'extension/pn_black/admin/view/template/module/pn_black/_macros.twig' as dc %}
+{% include 'extension/pn_black/admin/view/template/module/pn_black/_layout_start.twig' %}
+
+{% set footer_logo_thumb = image_fields.logo|default(placeholder) %}
+{% if settings.logo|default('') and not image_fields.logo %}
+  {% set footer_logo_thumb = '../image/' ~ settings.logo %}
+{% endif %}
+
+<div class="dc-section-card dc-section">
+  <div class="dc-section-card__head">
+    <span class="dc-section-card__icon"><i class="fa fa-image"></i></span>
+    <div><h3 class="dc-section-card__title">{{ entry_logo }}</h3></div>
+  </div>
+  <div class="dc-field">
+    <label class="dc-label">{{ entry_logo }}</label>
+    {{ dc.image_manager('logo', settings.logo|default(''), footer_logo_thumb, placeholder, 'footer-logo') }}
+  </div>
+  <div class="dc-field">
+    <label class="dc-label">Brand text</label>
+    <input class="dc-input" type="text" name="module_pn_black[brand_text]" value="{{ settings.brand_text|default('NØR.') }}"/>
+  </div>
+  <div class="dc-lang-pills">
+    {% for language in languages %}
+      {{ dc.language_pill(language, 'lang-footer-desc-' ~ language.language_id, loop.first) }}
+    {% endfor %}
+  </div>
+  {% for language in languages %}
+    <div class="dc-lang-panel{% if loop.first %} dc-active{% endif %}" id="lang-footer-desc-{{ language.language_id }}">
+      <div class="dc-field">
+        <label class="dc-label">{{ entry_description }}</label>
+        <textarea class="dc-input" rows="3" name="module_pn_black[description][{{ language.language_id }}]">{{ settings.description[language.language_id]|default('') }}</textarea>
+      </div>
+      <div class="dc-field">
+        <label class="dc-label">Locations line</label>
+        <input class="dc-input" type="text" name="module_pn_black[locations][{{ language.language_id }}]" value="{{ settings.locations[language.language_id]|default('') }}"/>
+      </div>
+    </div>
+  {% endfor %}
+</div>
+
+<div class="dc-section-card dc-section">
+  <div class="dc-section-card__head">
+    <span class="dc-section-card__icon"><i class="fa fa-share-alt"></i></span>
+    <div><h3 class="dc-section-card__title">{{ text_add_social }}</h3></div>
+    <div class="dc-section-card__actions">
+      <button type="button" class="dc-btn dc-btn--light" data-dc-add-item="socials" data-dc-template="social-template"><i class="fa fa-plus"></i> {{ text_add_social }}</button>
+    </div>
+  </div>
+
+  <div class="dc-accordion dc-accordion--sortable" id="socials-accordion" data-dc-accordion-list="socials" data-dc-reindex="module_pn_black[socials]">
+    {% set socials = settings.socials|default([]) %}
+    {% for social in socials %}
+      {% set idx = loop.index0 %}
+      <div class="dc-accordion__item{% if loop.first %} dc-open{% endif %}" data-dc-accordion-item data-dc-index="{{ idx }}">
+        <div class="dc-accordion__header-row">
+          <span class="dc-sort-handle dc-accordion__handle" title="{{ text_drag }}"><i class="fa fa-bars"></i></span>
+          <button type="button" class="dc-accordion__trigger" data-dc-accordion-trigger aria-expanded="{{ loop.first ? 'true' : 'false' }}">
+            <span class="dc-accordion__icon"><i class="fa fa-link"></i></span>
+            <span class="dc-accordion__title">
+              {{ social.title|default('Social ' ~ (idx + 1)) }}
+              <span class="dc-accordion__sub">{{ social.url|default('') }}</span>
+            </span>
+            <svg class="dc-accordion__chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <button type="button" class="dc-btn dc-btn--ghost dc-btn--danger" data-dc-remove-item><i class="fa fa-trash"></i></button>
+        </div>
+        <div class="dc-accordion__panel">
+          <div class="dc-accordion__content">
+            <div class="dc-accordion__body">
+              <div class="dc-row dc-row--2">
+                <div class="dc-field">
+                  <label class="dc-label">{{ entry_social_title }}</label>
+                  <input class="dc-input" type="text" name="module_pn_black[socials][{{ idx }}][title]" value="{{ social.title|default('') }}"/>
+                </div>
+                <div class="dc-field">
+                  <label class="dc-label">{{ entry_url }}</label>
+                  <input class="dc-input" type="url" name="module_pn_black[socials][{{ idx }}][url]" value="{{ social.url|default('') }}" placeholder="https://"/>
+                </div>
+              </div>
+              <div class="dc-field">
+                <label class="dc-label">{{ entry_icon }}</label>
+                <input class="dc-input" type="text" name="module_pn_black[socials][{{ idx }}][icon]" value="{{ social.icon|default('') }}" placeholder="fa-brands fa-instagram"/>
+                <p class="dc-help">Font Awesome (np. <code>fa-brands fa-instagram</code>) albo ścieżka pliku z katalogu <code>image/</code>.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+</div>
+
+<template id="social-template">
+  <div class="dc-accordion__item dc-open" data-dc-accordion-item data-dc-index="__INDEX__">
+    <div class="dc-accordion__header-row">
+      <span class="dc-sort-handle dc-accordion__handle" title="{{ text_drag }}"><i class="fa fa-bars"></i></span>
+      <button type="button" class="dc-accordion__trigger" data-dc-accordion-trigger aria-expanded="true">
+        <span class="dc-accordion__icon"><i class="fa fa-link"></i></span>
+        <span class="dc-accordion__title">
+          New social link
+          <span class="dc-accordion__sub">{{ entry_url }}</span>
+        </span>
+        <svg class="dc-accordion__chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <button type="button" class="dc-btn dc-btn--ghost dc-btn--danger" data-dc-remove-item><i class="fa fa-trash"></i></button>
+    </div>
+    <div class="dc-accordion__panel">
+      <div class="dc-accordion__content">
+        <div class="dc-accordion__body">
+          <div class="dc-row dc-row--2">
+            <div class="dc-field">
+              <label class="dc-label">{{ entry_social_title }}</label>
+              <input class="dc-input" type="text" name="module_pn_black[socials][__INDEX__][title]" value=""/>
+            </div>
+            <div class="dc-field">
+              <label class="dc-label">{{ entry_url }}</label>
+              <input class="dc-input" type="url" name="module_pn_black[socials][__INDEX__][url]" value="" placeholder="https://"/>
+            </div>
+          </div>
+          <div class="dc-field">
+            <label class="dc-label">{{ entry_icon }}</label>
+            <input class="dc-input" type="text" name="module_pn_black[socials][__INDEX__][icon]" value="" placeholder="fa-brands fa-instagram"/>
+            <p class="dc-help">Font Awesome (np. <code>fa-brands fa-instagram</code>) albo ścieżka pliku z katalogu <code>image/</code>.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<div class="dc-section-card dc-section">
+  <div class="dc-section-card__head">
+    <span class="dc-section-card__icon"><i class="fa fa-sitemap"></i></span>
+    <div>
+      <h3 class="dc-section-card__title">{{ text_information|default('Navigation') }}</h3>
+      <p class="dc-section-card__sub">Kolumny stopki (Information / Service / Extra / Account) biorą się z OpenCart — jak w domyślnym <code>common/footer</code>. Linki Information edytujesz w Catalog → Information.</p>
+    </div>
+  </div>
+</div>
+
+<div class="dc-section-card dc-section">
+  <div class="dc-section-card__head">
+    <span class="dc-section-card__icon"><i class="fa fa-phone"></i></span>
+    <div><h3 class="dc-section-card__title">{{ text_add_contact }}</h3></div>
+    <div class="dc-section-card__actions">
+      <button type="button" class="dc-btn dc-btn--light" data-dc-add-item="contacts" data-dc-template="contact-template"><i class="fa fa-plus"></i> {{ text_add_contact }}</button>
+    </div>
+  </div>
+
+  <div class="dc-accordion dc-accordion--sortable" id="contacts-accordion" data-dc-accordion-list="contacts" data-dc-reindex="module_pn_black[contacts]">
+    {% set contacts = settings.contacts|default([]) %}
+    {% for contact in contacts %}
+      {% set idx = loop.index0 %}
+      <div class="dc-accordion__item{% if loop.first %} dc-open{% endif %}" data-dc-accordion-item data-dc-index="{{ idx }}">
+        <div class="dc-accordion__header-row">
+          <span class="dc-sort-handle dc-accordion__handle" title="{{ text_drag }}"><i class="fa fa-bars"></i></span>
+          <button type="button" class="dc-accordion__trigger" data-dc-accordion-trigger aria-expanded="{{ loop.first ? 'true' : 'false' }}">
+            <span class="dc-accordion__icon">{{ contact.icon|default('📞') }}</span>
+            <span class="dc-accordion__title">
+              {{ contact.value|default('Contact ' ~ (idx + 1)) }}
+              <span class="dc-accordion__sub">{{ contact.label[languages[0].language_id]|default('') }}</span>
+            </span>
+            <svg class="dc-accordion__chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <button type="button" class="dc-btn dc-btn--ghost dc-btn--danger" data-dc-remove-item><i class="fa fa-trash"></i></button>
+        </div>
+        <div class="dc-accordion__panel">
+          <div class="dc-accordion__content">
+            <div class="dc-accordion__body">
+              {{ dc.emoji_picker('[contacts][' ~ idx ~ '][icon]', contact.icon|default('📞'), 'list', 'contact-icon-' ~ idx) }}
+              <div class="dc-field">
+                <label class="dc-label">{{ entry_value }}</label>
+                <input class="dc-input" type="text" name="module_pn_black[contacts][{{ idx }}][value]" value="{{ contact.value|default('') }}"/>
+              </div>
+              <div class="dc-lang-pills">
+                {% for language in languages %}
+                  {{ dc.language_pill(language, 'lang-contact-' ~ idx ~ '-' ~ language.language_id, loop.first) }}
+                {% endfor %}
+              </div>
+              {% for language in languages %}
+                <div class="dc-lang-panel{% if loop.first %} dc-active{% endif %}" id="lang-contact-{{ idx }}-{{ language.language_id }}">
+                  <div class="dc-row dc-row--2">
+                    <div class="dc-field">
+                      <label class="dc-label">{{ entry_label }}</label>
+                      <input class="dc-input" type="text" name="module_pn_black[contacts][{{ idx }}][label][{{ language.language_id }}]" value="{{ contact.label[language.language_id]|default('') }}"/>
+                    </div>
+                    <div class="dc-field">
+                      <label class="dc-label">{{ entry_sub }}</label>
+                      <input class="dc-input" type="text" name="module_pn_black[contacts][{{ idx }}][sub][{{ language.language_id }}]" value="{{ contact.sub[language.language_id]|default('') }}"/>
+                    </div>
+                  </div>
+                </div>
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+</div>
+
+<template id="contact-template">
+  <div class="dc-accordion__item dc-open" data-dc-accordion-item data-dc-index="__INDEX__">
+    <div class="dc-accordion__header-row">
+      <span class="dc-sort-handle dc-accordion__handle" title="{{ text_drag }}"><i class="fa fa-bars"></i></span>
+      <button type="button" class="dc-accordion__trigger" data-dc-accordion-trigger aria-expanded="true">
+        <span class="dc-accordion__icon">📞</span>
+        <span class="dc-accordion__title">
+          New contact
+          <span class="dc-accordion__sub">{{ entry_label }}</span>
+        </span>
+        <svg class="dc-accordion__chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <button type="button" class="dc-btn dc-btn--ghost dc-btn--danger" data-dc-remove-item><i class="fa fa-trash"></i></button>
+    </div>
+    <div class="dc-accordion__panel">
+      <div class="dc-accordion__content">
+        <div class="dc-accordion__body">
+          <div class="dc-field dc-emoji-field">
+            <label class="dc-label">{{ entry_icon }}</label>
+            <div class="dc-emoji-picker-wrap">
+              <button type="button" class="dc-btn dc-btn--ghost dc-emoji-trigger" data-emoji-target="#input-contact-icon-__INDEX__" data-emoji-preview="#preview-contact-icon-__INDEX__" data-emoji-source="list">
+                <span class="dc-emoji-preview" id="preview-contact-icon-__INDEX__">📞</span>
+              </button>
+              <input type="hidden" name="module_pn_black[contacts][__INDEX__][icon]" value="📞" id="input-contact-icon-__INDEX__"/>
+            </div>
+          </div>
+          <div class="dc-field">
+            <label class="dc-label">{{ entry_value }}</label>
+            <input class="dc-input" type="text" name="module_pn_black[contacts][__INDEX__][value]" value=""/>
+          </div>
+          <div class="dc-lang-pills">
+            {% for language in languages %}
+              {{ dc.language_pill(language, 'lang-contact-__INDEX__-' ~ language.language_id, loop.first) }}
+            {% endfor %}
+          </div>
+          {% for language in languages %}
+            <div class="dc-lang-panel{% if loop.first %} dc-active{% endif %}" id="lang-contact-__INDEX__-{{ language.language_id }}">
+              <div class="dc-row dc-row--2">
+                <div class="dc-field">
+                  <label class="dc-label">{{ entry_label }}</label>
+                  <input class="dc-input" type="text" name="module_pn_black[contacts][__INDEX__][label][{{ language.language_id }}]" value=""/>
+                </div>
+                <div class="dc-field">
+                  <label class="dc-label">{{ entry_sub }}</label>
+                  <input class="dc-input" type="text" name="module_pn_black[contacts][__INDEX__][sub][{{ language.language_id }}]" value=""/>
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<div class="dc-section-card dc-section">
+  <div class="dc-section-card__head">
+    <span class="dc-section-card__icon"><i class="fa fa-gavel"></i></span>
+    <div><h3 class="dc-section-card__title">{{ entry_terms }}</h3></div>
+  </div>
+  <div class="dc-row dc-row--3">
+    <div class="dc-field">
+      <label class="dc-label">{{ entry_terms }}</label>
+      <select class="dc-input" name="module_pn_black[information_terms]">
+        <option value="0">—</option>
+        {% for information in informations %}
+          <option value="{{ information.information_id }}"{% if settings.information_terms|default(0) == information.information_id %} selected{% endif %}>{{ information.title }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="dc-field">
+      <label class="dc-label">{{ entry_privacy }}</label>
+      <select class="dc-input" name="module_pn_black[information_privacy]">
+        <option value="0">—</option>
+        {% for information in informations %}
+          <option value="{{ information.information_id }}"{% if settings.information_privacy|default(0) == information.information_id %} selected{% endif %}>{{ information.title }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="dc-field">
+      <label class="dc-label">{{ entry_cookies }}</label>
+      <select class="dc-input" name="module_pn_black[information_cookies]">
+        <option value="0">—</option>
+        {% for information in informations %}
+          <option value="{{ information.information_id }}"{% if settings.information_cookies|default(0) == information.information_id %} selected{% endif %}>{{ information.title }}</option>
+        {% endfor %}
+      </select>
+    </div>
+  </div>
+</div>
+
+<script type="text/javascript"><!--
+$(function() {
+  if (typeof $.fn.ckeditor === 'function') {
+    $('textarea[data-oc-toggle=\'ckeditor\']').each(function() {
+      var $el = $(this);
+      if (!$el.attr('id')) {
+        return;
+      }
+      if (typeof CKEDITOR !== 'undefined' && CKEDITOR.instances[$el.attr('id')]) {
+        return;
+      }
+      $el.ckeditor({
+        language: '{{ ckeditor|default('en')|escape('js') }}'
+      });
+    });
+  }
+
+  // Refresh editors when switching language pills (hidden tabs break CKEditor height)
+  $(document).on('click', '[data-dc-lang]', function() {
+    setTimeout(function() {
+      if (typeof CKEDITOR === 'undefined') return;
+      for (var id in CKEDITOR.instances) {
+        try { CKEDITOR.instances[id].resize(); } catch (e) {}
+      }
+    }, 50);
+  });
+});
+//--></script>
+
+{% include 'extension/pn_black/admin/view/template/module/pn_black/_layout_end.twig' %}

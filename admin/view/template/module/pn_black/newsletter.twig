@@ -1,0 +1,131 @@
+{#
+  Theme Black
+  Author: Paweł Nosko → https://pawelnosko.com/
+  Company: Design Cart → https://www.designcart.pl/
+#}
+{% import 'extension/pn_black/admin/view/template/module/pn_black/_macros.twig' as dc %}
+{% include 'extension/pn_black/admin/view/template/module/pn_black/_layout_start.twig' %}
+
+<div class="dc-section-card dc-section">
+  <div class="dc-section-card__head">
+    <span class="dc-section-card__icon"><i class="fa fa-language"></i></span>
+    <div><h3 class="dc-section-card__title">{{ entry_title }}</h3></div>
+  </div>
+  {{ dc.multilang_fields('', [
+    { key: 'badge', label: entry_badge },
+    { key: 'title', label: entry_title },
+    { key: 'description', label: entry_description, type: 'textarea', rows: 3 },
+    { key: 'placeholder', label: entry_placeholder },
+    { key: 'button', label: entry_button },
+    { key: 'footer_text', label: entry_footer_text, type: 'textarea', rows: 2 },
+    { key: 'rodo', label: entry_rodo, type: 'textarea', rows: 3 }
+  ], settings, languages, 'newsletter-text') }}
+</div>
+
+<div class="dc-section-card dc-section">
+  <div class="dc-section-card__head">
+    <span class="dc-section-card__icon"><i class="fa fa-tags"></i></span>
+    <div><h3 class="dc-section-card__title">{{ text_add_tag }}</h3></div>
+    <div class="dc-section-card__actions">
+      <button type="button" class="dc-btn dc-btn--light" data-dc-add-item="tags" data-dc-template="tag-template"><i class="fa fa-plus"></i> {{ text_add_tag }}</button>
+    </div>
+  </div>
+
+  <div class="dc-dynamic-list" id="tags-list" data-dc-accordion-list="tags" data-dc-reindex="module_pn_black[tags]">
+    {% set tags = settings.tags|default([]) %}
+    {% for tag in tags %}
+      {% set idx = loop.index0 %}
+      <div class="dc-dynamic-item" data-dc-accordion-item data-dc-index="{{ idx }}">
+        <span class="dc-sort-handle" title="{{ text_drag }}"><i class="fa fa-bars"></i></span>
+        {{ dc.emoji_picker('[tags][' ~ idx ~ '][icon]', tag.icon|default('🎉'), 'list', 'tag-icon-' ~ idx) }}
+        <div class="dc-dynamic-item__fields">
+          <div class="dc-lang-pills">
+            {% for language in languages %}
+              {{ dc.language_pill(language, 'lang-tag-' ~ idx ~ '-' ~ language.language_id, loop.first) }}
+            {% endfor %}
+          </div>
+          {% for language in languages %}
+            <div class="dc-lang-panel{% if loop.first %} dc-active{% endif %}" id="lang-tag-{{ idx }}-{{ language.language_id }}">
+              <div class="dc-field">
+                <label class="dc-label">{{ entry_label }}</label>
+                <input class="dc-input" type="text" name="module_pn_black[tags][{{ idx }}][text][{{ language.language_id }}]" value="{{ tag.text[language.language_id]|default('') }}"/>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+        <button type="button" class="dc-btn dc-btn--ghost dc-btn--danger" data-dc-remove-item><i class="fa fa-trash"></i></button>
+      </div>
+    {% endfor %}
+  </div>
+</div>
+
+<template id="tag-template">
+  <div class="dc-dynamic-item" data-dc-accordion-item data-dc-index="__INDEX__">
+    <span class="dc-sort-handle" title="{{ text_drag }}"><i class="fa fa-bars"></i></span>
+    <div class="dc-field dc-emoji-field">
+      <label class="dc-label">{{ entry_icon }}</label>
+      <div class="dc-emoji-picker-wrap">
+        <button type="button" class="dc-btn dc-btn--ghost dc-emoji-trigger" data-emoji-target="#input-tag-icon-__INDEX__" data-emoji-preview="#preview-tag-icon-__INDEX__" data-emoji-source="list">
+          <span class="dc-emoji-preview" id="preview-tag-icon-__INDEX__">🎉</span>
+        </button>
+        <input type="hidden" name="module_pn_black[tags][__INDEX__][icon]" value="🎉" id="input-tag-icon-__INDEX__"/>
+      </div>
+    </div>
+    <div class="dc-dynamic-item__fields">
+      <div class="dc-lang-pills">
+        {% for language in languages %}
+          {{ dc.language_pill(language, 'lang-tag-__INDEX__-' ~ language.language_id, loop.first) }}
+        {% endfor %}
+      </div>
+      {% for language in languages %}
+        <div class="dc-lang-panel{% if loop.first %} dc-active{% endif %}" id="lang-tag-__INDEX__-{{ language.language_id }}">
+          <div class="dc-field">
+            <label class="dc-label">{{ entry_label }}</label>
+            <input class="dc-input" type="text" name="module_pn_black[tags][__INDEX__][text][{{ language.language_id }}]" value=""/>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+    <button type="button" class="dc-btn dc-btn--ghost dc-btn--danger" data-dc-remove-item><i class="fa fa-trash"></i></button>
+  </div>
+</template>
+
+<div class="dc-section-card dc-section">
+  <div class="dc-section-card__head">
+    <span class="dc-section-card__icon"><i class="fa fa-users"></i></span>
+    <div>
+      <h3 class="dc-section-card__title">{{ text_subscribers }}</h3>
+      <div class="dc-section-card__actions">
+        <a href="{{ export }}" class="dc-btn dc-btn--light"><i class="fa fa-download"></i> {{ text_export_csv }}</a>
+      </div>
+    </div>
+  </div>
+  <div class="table-responsive">
+    <table class="table table-bordered dc-subscribers-table">
+      <thead>
+        <tr>
+          <th>Email</th>
+          <th>Date</th>
+          <th>IP</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% if subscribers %}
+          {% for row in subscribers %}
+            <tr>
+              <td>{{ row.email|default('') }}</td>
+              <td>{{ row.date|default('') }}</td>
+              <td>{{ row.ip|default('') }}</td>
+            </tr>
+          {% endfor %}
+        {% else %}
+          <tr>
+            <td colspan="3" class="text-center">{{ text_no_subscribers }}</td>
+          </tr>
+        {% endif %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{% include 'extension/pn_black/admin/view/template/module/pn_black/_layout_end.twig' %}

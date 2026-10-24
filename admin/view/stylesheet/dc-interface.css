@@ -1,0 +1,14 @@
+/*
+ * Theme Black
+ * Author: Paweł Nosko → https://pawelnosko.com/
+ * Company: Design Cart → https://www.designcart.pl/
+ */
+@import url("dc-tokens.css");
+@import url("dc-hero.css");
+@import url("dc-layout.css");
+@import url("dc-tabs.css");
+@import url("dc-accordion.css");
+@import url("dc-switch.css");
+@import url("dc-dimension.css");
+@import url("dc-forms.css");
+@import url("dc-colorpicker.css");

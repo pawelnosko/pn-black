@@ -1,0 +1,41 @@
+{#
+  Theme Black
+  Author: Paweł Nosko → https://pawelnosko.com/
+  Company: Design Cart → https://www.designcart.pl/
+#}
+{% import 'extension/pn_black/admin/view/template/module/pn_black/_macros.twig' as dc %}
+{% include 'extension/pn_black/admin/view/template/module/pn_black/_layout_start.twig' %}
+
+<div class="dc-section-card dc-section">
+  <div class="dc-section-card__head">
+    <span class="dc-section-card__icon"><i class="fa fa-image"></i></span>
+    <div><h3 class="dc-section-card__title">{{ entry_logo }}</h3></div>
+  </div>
+  <div class="dc-field">
+    <label class="dc-label">{{ entry_logo }}</label>
+    {{ dc.image_manager('logo', settings.logo|default(''), image_fields.logo|default(placeholder), placeholder, 'logo') }}
+  </div>
+  <div class="dc-field">
+    <label class="dc-label">Brand text (when no logo)</label>
+    <input class="dc-input" type="text" name="module_pn_black[brand_text]" value="{{ settings.brand_text|default('NØR.') }}"/>
+  </div>
+</div>
+
+<div class="dc-section-card dc-section">
+  <div class="dc-section-card__head">
+    <span class="dc-section-card__icon"><i class="fa fa-language"></i></span>
+    <div><h3 class="dc-section-card__title">Labels</h3></div>
+  </div>
+  <p class="dc-help mb-3">Menu items come from Catalog → Categories (top-level + children). No extra nav setup here.</p>
+  {{ dc.multilang_fields('', [
+    { key: 'top_bar', label: entry_top_bar },
+    { key: 'menu_label', label: 'Mobile menu button' },
+    { key: 'account_label', label: entry_account_label },
+    { key: 'wishlist_label', label: entry_wishlist_label },
+    { key: 'cart_label', label: entry_cart_label },
+    { key: 'search_placeholder', label: entry_search_placeholder },
+    { key: 'search_button', label: entry_search_button }
+  ], settings, languages, 'header') }}
+</div>
+
+{% include 'extension/pn_black/admin/view/template/module/pn_black/_layout_end.twig' %}

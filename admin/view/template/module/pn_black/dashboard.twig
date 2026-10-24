@@ -1,0 +1,44 @@
+{#
+  Theme Black
+  Author: Paweł Nosko → https://pawelnosko.com/
+  Company: Design Cart → https://www.designcart.pl/
+#}
+{{ header }}{{ column_left }}
+<div id="content" class="dc-page pn-black-dashboard">
+  <div class="dc-hero">
+    <div class="dc-hero__mesh"></div>
+    <img class="dc-hero__logo" src="{{ dc_asset }}image/dc-logo-white.png" alt="" aria-hidden="true">
+    <div class="dc-hero__orb dc-hero__orb--1"></div>
+    <div class="dc-hero__orb dc-hero__orb--2"></div>
+    <div class="dc-hero__inner">
+      <div class="dc-hero__row">
+        <div class="dc-hero__brand">
+          <span class="dc-hero__icon">⬛</span>
+          <div>
+            <p class="dc-hero__eyebrow">Paweł Nosko / Design Cart</p>
+            <h1 class="dc-hero__title">Theme Black Config</h1>
+          </div>
+        </div>
+      </div>
+      <ul class="dc-hero__bc">
+        {% for breadcrumb in breadcrumbs %}
+          <li>{% if breadcrumb.href %}<a href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a>{% else %}{{ breadcrumb.text }}{% endif %}</li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+
+  <div class="dc-page__wrap">
+    <p class="dc-dashboard-intro">{{ text_dashboard }}</p>
+    <div class="dc-dashboard-grid">
+      {% for section in sections %}
+        <a href="{{ section.href }}" class="dc-dashboard-tile">
+          <span class="dc-dashboard-tile__icon">{{ section.icon }}</span>
+          <span class="dc-dashboard-tile__title">{{ section.title }}</span>
+          <span class="dc-dashboard-tile__arrow"><i class="fa fa-arrow-right"></i></span>
+        </a>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{{ footer }}

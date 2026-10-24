@@ -1,0 +1,94 @@
+{#
+  Theme Black
+  Author: Paweł Nosko → https://pawelnosko.com/
+  Company: Design Cart → https://www.designcart.pl/
+#}
+{% import 'extension/pn_black/admin/view/template/module/pn_black/_macros.twig' as dc %}
+{% include 'extension/pn_black/admin/view/template/module/pn_black/_layout_start.twig' %}
+
+{% set picks = product_picks|default([]) %}
+{% set selected_ids = picks|map(p => p.product_id) %}
+{% set catalog = product_catalog|default([]) %}
+
+<div class="dc-section-card dc-section">
+  <div class="dc-section-card__head">
+    <span class="dc-section-card__icon"><i class="fa fa-th-large"></i></span>
+    <div>
+      <h3 class="dc-section-card__title">{{ section_carousels }}</h3>
+      <p class="dc-section-card__sub">{{ help_collection_home }}</p>
+    </div>
+  </div>
+
+  <div class="dc-tabs dc-tabs--section" data-dc-tab-panels="#panels-collection">
+    <button type="button" class="dc-tabs__btn dc-active" data-dc-tab="collection-products" role="tab" aria-selected="true">
+      <i class="fa fa-th-large"></i> {{ entry_tab_products }}
+    </button>
+    <button type="button" class="dc-tabs__btn" data-dc-tab="collection-content" role="tab" aria-selected="false">
+      <i class="fa fa-font"></i> {{ entry_tab_content }}
+    </button>
+  </div>
+
+  <div class="dc-tab-panels" id="panels-collection">
+    <div class="dc-tab-panel dc-active" id="collection-products">
+      <div class="dc-product-picker" data-dc-product-picker data-group="root" data-user-token="{{ user_token }}" data-autocomplete-route="extension/pn_black/module/pn_black.productAutocomplete" data-field-name="module_pn_black[products][]">
+        <div class="dc-field">
+          <label class="dc-label">{{ entry_search_products }}</label>
+          <input type="search" class="dc-input" data-dc-product-search placeholder="{{ entry_search_products_placeholder }}" autocomplete="off" enterkeyhint="search"/>
+          <p class="dc-help">{{ help_product_picker }}</p>
+        </div>
+
+        <div class="dc-product-picker__results" data-dc-product-results>
+          <div class="dc-tile-grid dc-tile-grid--products" data-dc-selectable-tiles>
+            {% for product in catalog %}
+              {% set is_selected = product.product_id in selected_ids %}
+              <div class="dc-select-tile dc-select-tile--product{% if is_selected %} dc-select-tile--active{% endif %}" data-dc-select-tile data-product-id="{{ product.product_id }}">
+                <label class="dc-check dc-select-tile__check">
+                  <input class="dc-check__input" type="checkbox" value="{{ product.product_id }}"{% if is_selected %} checked{% endif %} data-dc-tile-checkbox/>
+                  <span class="dc-check__box"></span>
+                </label>
+                <div class="dc-select-tile__image">
+                  <img src="{{ product.image }}" alt="{{ product.name|e('html_attr') }}" loading="lazy"/>
+                </div>
+                <div class="dc-select-tile__body">
+                  <strong class="dc-select-tile__name">{{ product.name }}</strong>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+
+        <div class="dc-product-picker__selected-head">
+          <strong>{{ entry_selected_products }}</strong>
+          <span class="dc-product-picker__count" data-dc-product-count>{{ picks|length }}</span>
+        </div>
+        <div class="dc-tile-grid dc-tile-grid--products" data-dc-product-selected data-dc-selectable-tiles>
+          {% for product in picks %}
+            <div class="dc-select-tile dc-select-tile--product dc-select-tile--active" data-dc-select-tile data-product-id="{{ product.product_id }}">
+              <label class="dc-check dc-select-tile__check">
+                <input class="dc-check__input" type="checkbox" name="module_pn_black[products][]" value="{{ product.product_id }}" checked data-dc-tile-checkbox/>
+                <span class="dc-check__box"></span>
+              </label>
+              <div class="dc-select-tile__image">
+                <img src="{{ product.image }}" alt="{{ product.name|e('html_attr') }}" loading="lazy"/>
+              </div>
+              <div class="dc-select-tile__body">
+                <strong class="dc-select-tile__name">{{ product.name }}</strong>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+        <p class="dc-help dc-product-picker__empty"{% if picks %} hidden{% endif %} data-dc-product-empty>{{ text_no_products_selected }}</p>
+      </div>
+    </div>
+
+    <div class="dc-tab-panel" id="collection-content">
+      {{ dc.multilang_fields('', [
+        { key: 'badge', label: entry_badge },
+        { key: 'title', label: entry_title }
+      ], settings, languages, 'collection-head') }}
+      <p class="dc-help">{{ help_collection_filters }}</p>
+    </div>
+  </div>
+</div>
+
+{% include 'extension/pn_black/admin/view/template/module/pn_black/_layout_end.twig' %}

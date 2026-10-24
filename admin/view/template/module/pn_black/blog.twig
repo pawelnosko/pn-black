@@ -1,0 +1,147 @@
+{#
+  Theme Black
+  Author: Paweł Nosko → https://pawelnosko.com/
+  Company: Design Cart → https://www.designcart.pl/
+#}
+{% import 'extension/pn_black/admin/view/template/module/pn_black/_macros.twig' as dc %}
+{% include 'extension/pn_black/admin/view/template/module/pn_black/_layout_start.twig' %}
+
+{% set mode = settings.mode|default('latest') %}
+{% set picks = article_picks|default([]) %}
+{% set selected_ids = picks|map(p => p.article_id) %}
+{% set catalog = article_catalog|default([]) %}
+{% set topics = cms_topics|default([]) %}
+
+<div class="dc-section-card dc-section">
+  <div class="dc-section-card__head">
+    <span class="dc-section-card__icon"><i class="fa fa-newspaper-o"></i></span>
+    <div>
+      <h3 class="dc-section-card__title">{{ section_blog }}</h3>
+      <p class="dc-section-card__sub">{{ help_blog_home }}</p>
+    </div>
+  </div>
+
+  <div class="dc-tabs dc-tabs--section" data-dc-tab-panels="#panels-blog">
+    <button type="button" class="dc-tabs__btn dc-active" data-dc-tab="blog-articles" role="tab" aria-selected="true">
+      <i class="fa fa-list"></i> {{ entry_tab_articles }}
+    </button>
+    <button type="button" class="dc-tabs__btn" data-dc-tab="blog-content" role="tab" aria-selected="false">
+      <i class="fa fa-font"></i> {{ entry_tab_content }}
+    </button>
+  </div>
+
+  <div class="dc-tab-panels" id="panels-blog">
+    <div class="dc-tab-panel dc-active" id="blog-articles">
+      <div class="dc-row dc-row--3">
+        <div class="dc-field">
+          <label class="dc-label">{{ entry_blog_mode }}</label>
+          <select class="dc-input" name="module_pn_black[mode]" id="input-blog-mode">
+            <option value="latest"{% if mode != 'manual' %} selected{% endif %}>{{ text_blog_mode_latest }}</option>
+            <option value="manual"{% if mode == 'manual' %} selected{% endif %}>{{ text_blog_mode_manual }}</option>
+          </select>
+          <p class="dc-help">{{ help_blog_mode }}</p>
+        </div>
+        <div class="dc-field">
+          <label class="dc-label">{{ entry_blog_topic }}</label>
+          <select class="dc-input" name="module_pn_black[topic_id]">
+            <option value="0">{{ text_all_topics }}</option>
+            {% for topic in topics %}
+              <option value="{{ topic.topic_id }}"{% if settings.topic_id|default(0) == topic.topic_id %} selected{% endif %}>{{ topic.name }}</option>
+            {% endfor %}
+          </select>
+          <p class="dc-help">{{ help_blog_topic }}</p>
+        </div>
+        <div class="dc-field">
+          <label class="dc-label">{{ entry_blog_limit }}</label>
+          <input class="dc-input" type="number" min="1" max="12" name="module_pn_black[limit]" value="{{ settings.limit|default(3) }}"/>
+        </div>
+      </div>
+
+      <div class="dc-product-picker" data-dc-product-picker data-group="blog" data-user-token="{{ user_token }}" data-autocomplete-route="extension/pn_black/module/pn_black.articleAutocomplete" data-field-name="module_pn_black[articles][]" id="blog-manual-picker"{% if mode != 'manual' %} style="opacity:.55"{% endif %}>
+        <div class="dc-field">
+          <label class="dc-label">{{ entry_search_articles }}</label>
+          <input type="search" class="dc-input" data-dc-product-search placeholder="{{ entry_search_articles_placeholder }}" autocomplete="off" enterkeyhint="search"/>
+          <p class="dc-help">{{ help_article_picker }}</p>
+        </div>
+
+        <div class="dc-product-picker__results" data-dc-product-results>
+          <div class="dc-tile-grid dc-tile-grid--products" data-dc-selectable-tiles>
+            {% for article in catalog %}
+              {% set is_selected = article.article_id in selected_ids %}
+              <div class="dc-select-tile dc-select-tile--product{% if is_selected %} dc-select-tile--active{% endif %}" data-dc-select-tile data-product-id="{{ article.article_id }}">
+                <label class="dc-check dc-select-tile__check">
+                  <input class="dc-check__input" type="checkbox" value="{{ article.article_id }}"{% if is_selected %} checked{% endif %} data-dc-tile-checkbox/>
+                  <span class="dc-check__box"></span>
+                </label>
+                <div class="dc-select-tile__image">
+                  <img src="{{ article.image }}" alt="{{ article.name|e('html_attr') }}" loading="lazy"/>
+                </div>
+                <div class="dc-select-tile__body">
+                  <strong class="dc-select-tile__name">{{ article.name }}</strong>
+                </div>
+              </div>
+            {% else %}
+              <p class="dc-help">{{ text_no_cms_articles }}</p>
+            {% endfor %}
+          </div>
+        </div>
+
+        <div class="dc-product-picker__selected-head">
+          <strong>{{ entry_selected_articles }}</strong>
+          <span class="dc-product-picker__count" data-dc-product-count>{{ picks|length }}</span>
+        </div>
+        <div class="dc-tile-grid dc-tile-grid--products" data-dc-product-selected data-dc-selectable-tiles>
+          {% for article in picks %}
+            <div class="dc-select-tile dc-select-tile--product dc-select-tile--active" data-dc-select-tile data-product-id="{{ article.article_id }}">
+              <label class="dc-check dc-select-tile__check">
+                <input class="dc-check__input" type="checkbox" name="module_pn_black[articles][]" value="{{ article.article_id }}" checked data-dc-tile-checkbox/>
+                <span class="dc-check__box"></span>
+              </label>
+              <div class="dc-select-tile__image">
+                <img src="{{ article.image }}" alt="{{ article.name|e('html_attr') }}" loading="lazy"/>
+              </div>
+              <div class="dc-select-tile__body">
+                <strong class="dc-select-tile__name">{{ article.name }}</strong>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+        <p class="dc-help dc-product-picker__empty"{% if picks %} hidden{% endif %} data-dc-product-empty>{{ text_no_articles_selected }}</p>
+      </div>
+    </div>
+
+    <div class="dc-tab-panel" id="blog-content">
+      {{ dc.multilang_fields('', [
+        { key: 'badge', label: entry_badge },
+        { key: 'title', label: entry_title },
+        { key: 'title_accent', label: entry_title_accent },
+        { key: 'teaser_description', label: entry_blog_teaser, type: 'textarea', rows: 3 },
+        { key: 'teaser_badge', label: entry_image_badge },
+        { key: 'teaser_cta', label: entry_cta },
+        { key: 'grid_badge', label: entry_blog_grid_badge },
+        { key: 'grid_title', label: entry_blog_grid_title },
+        { key: 'read_more', label: entry_read_more },
+        { key: 'all_articles', label: entry_all_articles }
+      ], settings, languages, 'blog-text') }}
+      <div class="dc-field">
+        <label class="dc-label">{{ entry_blog_teaser_image }}</label>
+        {{ dc.image_manager('teaser_image', settings.teaser_image|default(''), image_fields.teaser_image|default(placeholder), placeholder, 'teaser-image') }}
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  var mode = document.getElementById('input-blog-mode');
+  var picker = document.getElementById('blog-manual-picker');
+  if (!mode || !picker) return;
+  function sync() {
+    picker.style.opacity = mode.value === 'manual' ? '1' : '0.55';
+  }
+  mode.addEventListener('change', sync);
+  sync();
+})();
+</script>
+
+{% include 'extension/pn_black/admin/view/template/module/pn_black/_layout_end.twig' %}

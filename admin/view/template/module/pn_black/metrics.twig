@@ -1,0 +1,133 @@
+{#
+  Theme Black
+  Author: Paweł Nosko → https://pawelnosko.com/
+  Company: Design Cart → https://www.designcart.pl/
+#}
+{% import 'extension/pn_black/admin/view/template/module/pn_black/_macros.twig' as dc %}
+{% include 'extension/pn_black/admin/view/template/module/pn_black/_layout_start.twig' %}
+
+<div class="dc-section-card dc-section">
+  <div class="dc-section-card__head">
+    <span class="dc-section-card__icon"><i class="fa fa-language"></i></span>
+    <div>
+      <h3 class="dc-section-card__title">{{ entry_title }}</h3>
+      <p class="dc-section-card__sub">{{ help_metrics_home }}</p>
+    </div>
+  </div>
+  {{ dc.multilang_fields('', [
+    { key: 'badge', label: entry_badge },
+    { key: 'title', label: entry_title }
+  ], settings, languages, 'metrics-head') }}
+</div>
+
+<div class="dc-section-card dc-section">
+  <div class="dc-section-card__head">
+    <span class="dc-section-card__icon"><i class="fa fa-bar-chart"></i></span>
+    <div><h3 class="dc-section-card__title">{{ entry_metrics_items }}</h3></div>
+    <div class="dc-section-card__actions">
+      <button type="button" class="dc-btn dc-btn--light" data-dc-add-item="items" data-dc-template="metric-template"><i class="fa fa-plus"></i> {{ text_add_metric }}</button>
+    </div>
+  </div>
+
+  <div class="dc-accordion dc-accordion--sortable" id="metrics-accordion" data-dc-accordion-list="items" data-dc-reindex="module_pn_black[items]">
+    {% set items = settings.items|default([]) %}
+    {% for item in items %}
+      {% set idx = loop.index0 %}
+      {% set item_title = item.value|default('Metric') %}
+      {% if item.suffix %}{% set item_title = item_title ~ ' ' ~ item.suffix %}{% endif %}
+      {% set first_lang = languages|first %}
+      {% set item_label = item.label[first_lang.language_id]|default('') %}
+      <div class="dc-accordion__item{% if loop.first %} dc-open{% endif %}" data-dc-accordion-item data-dc-index="{{ idx }}">
+        <div class="dc-accordion__header-row">
+          <span class="dc-sort-handle dc-accordion__handle" title="{{ text_drag }}"><i class="fa fa-bars"></i></span>
+          <button type="button" class="dc-accordion__trigger" data-dc-accordion-trigger aria-expanded="{{ loop.first ? 'true' : 'false' }}">
+            <span class="dc-accordion__icon">＃</span>
+            <span class="dc-accordion__title">
+              {{ item_title }}
+              <span class="dc-accordion__sub">{{ item_label }}</span>
+            </span>
+            <svg class="dc-accordion__chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <button type="button" class="dc-btn dc-btn--ghost dc-btn--danger" data-dc-remove-item title="Remove"><i class="fa fa-trash"></i></button>
+        </div>
+        <div class="dc-accordion__panel">
+          <div class="dc-accordion__content">
+            <div class="dc-accordion__body">
+              <div class="dc-row dc-row--2">
+                <div class="dc-field">
+                  <label class="dc-label">{{ entry_stat_value }}</label>
+                  <input class="dc-input" type="text" name="module_pn_black[items][{{ idx }}][value]" value="{{ item.value|default('') }}" data-dc-metric-value/>
+                </div>
+                <div class="dc-field">
+                  <label class="dc-label">{{ entry_stat_suffix }}</label>
+                  <input class="dc-input" type="text" name="module_pn_black[items][{{ idx }}][suffix]" value="{{ item.suffix|default('') }}"/>
+                </div>
+              </div>
+              <div class="dc-lang-pills">
+                {% for language in languages %}
+                  {{ dc.language_pill(language, 'lang-metric-' ~ idx ~ '-' ~ language.language_id, loop.first) }}
+                {% endfor %}
+              </div>
+              {% for language in languages %}
+                <div class="dc-lang-panel{% if loop.first %} dc-active{% endif %}" id="lang-metric-{{ idx }}-{{ language.language_id }}">
+                  <div class="dc-field">
+                    <label class="dc-label">{{ entry_stat_label }}</label>
+                    <input class="dc-input" type="text" name="module_pn_black[items][{{ idx }}][label][{{ language.language_id }}]" value="{{ item.label[language.language_id]|default('') }}"/>
+                  </div>
+                </div>
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+</div>
+
+<template id="metric-template">
+  <div class="dc-accordion__item dc-open" data-dc-accordion-item data-dc-index="__INDEX__">
+    <div class="dc-accordion__header-row">
+      <span class="dc-sort-handle dc-accordion__handle" title="{{ text_drag }}"><i class="fa fa-bars"></i></span>
+      <button type="button" class="dc-accordion__trigger" data-dc-accordion-trigger aria-expanded="true">
+        <span class="dc-accordion__icon">＃</span>
+        <span class="dc-accordion__title">
+          New metric
+          <span class="dc-accordion__sub">{{ entry_stat_label }}</span>
+        </span>
+        <svg class="dc-accordion__chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <button type="button" class="dc-btn dc-btn--ghost dc-btn--danger" data-dc-remove-item title="Remove"><i class="fa fa-trash"></i></button>
+    </div>
+    <div class="dc-accordion__panel">
+      <div class="dc-accordion__content">
+        <div class="dc-accordion__body">
+          <div class="dc-row dc-row--2">
+            <div class="dc-field">
+              <label class="dc-label">{{ entry_stat_value }}</label>
+              <input class="dc-input" type="text" name="module_pn_black[items][__INDEX__][value]" value="" data-dc-metric-value/>
+            </div>
+            <div class="dc-field">
+              <label class="dc-label">{{ entry_stat_suffix }}</label>
+              <input class="dc-input" type="text" name="module_pn_black[items][__INDEX__][suffix]" value=""/>
+            </div>
+          </div>
+          <div class="dc-lang-pills">
+            {% for language in languages %}
+              {{ dc.language_pill(language, 'lang-metric-__INDEX__-' ~ language.language_id, loop.first) }}
+            {% endfor %}
+          </div>
+          {% for language in languages %}
+            <div class="dc-lang-panel{% if loop.first %} dc-active{% endif %}" id="lang-metric-__INDEX__-{{ language.language_id }}">
+              <div class="dc-field">
+                <label class="dc-label">{{ entry_stat_label }}</label>
+                <input class="dc-input" type="text" name="module_pn_black[items][__INDEX__][label][{{ language.language_id }}]" value=""/>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+{% include 'extension/pn_black/admin/view/template/module/pn_black/_layout_end.twig' %}

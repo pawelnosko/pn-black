@@ -1,0 +1,59 @@
+{#
+  Theme Black
+  Author: Paweł Nosko → https://pawelnosko.com/
+  Company: Design Cart → https://www.designcart.pl/
+#}
+{% import 'extension/pn_black/admin/view/template/module/pn_black/_macros.twig' as dc %}
+{% include 'extension/pn_black/admin/view/template/module/pn_black/_layout_start.twig' %}
+
+<div class="dc-section-card dc-section">
+  <div class="dc-section-card__head">
+    <span class="dc-section-card__icon"><i class="fa fa-language"></i></span>
+    <div><h3 class="dc-section-card__title">{{ entry_title }}</h3></div>
+  </div>
+  {{ dc.multilang_fields('', [
+    { key: 'badge', label: entry_badge },
+    { key: 'title', label: entry_title },
+    { key: 'title_accent', label: entry_title_accent },
+    { key: 'description', label: entry_description, type: 'textarea', rows: 3 }
+  ], settings, languages, 'categories-head') }}
+</div>
+
+<div class="dc-section-card dc-section">
+  <div class="dc-section-card__head">
+    <span class="dc-section-card__icon"><i class="fa fa-th"></i></span>
+    <div>
+      <h3 class="dc-section-card__title">{{ entry_selected }}</h3>
+      <p class="dc-section-card__sub">{{ help_categories }}</p>
+    </div>
+  </div>
+
+  {% set selected = settings.selected|default([]) %}
+  <div class="dc-tile-grid dc-tile-grid--sortable" data-dc-selectable-tiles data-dc-sortable-tiles>
+    {% for category in categories %}
+      {% set cid = category.category_id %}
+      {% set is_selected = cid in selected %}
+      {% set icon = settings.icons[cid]|default('🧸') %}
+      <div class="dc-select-tile{% if is_selected %} dc-select-tile--active{% endif %}" data-dc-select-tile>
+        <span class="dc-sort-handle dc-select-tile__handle" title="{{ text_drag }}"><i class="fa fa-bars"></i></span>
+        <label class="dc-check dc-select-tile__check">
+          <input class="dc-check__input" type="checkbox" name="module_pn_black[selected][]" value="{{ cid }}"{% if is_selected %} checked{% endif %} data-dc-tile-checkbox/>
+          <span class="dc-check__box"></span>
+        </label>
+        <button type="button" class="dc-select-tile__emoji" data-emoji-target="#input-cat-icon-{{ cid }}" data-emoji-preview="#preview-cat-icon-{{ cid }}" data-emoji-source="list">
+          <span id="preview-cat-icon-{{ cid }}">{{ icon }}</span>
+        </button>
+        <input type="hidden" name="module_pn_black[icons][{{ cid }}]" value="{{ icon }}" id="input-cat-icon-{{ cid }}"/>
+        <input type="hidden" name="module_pn_black[sort_order][{{ cid }}]" value="{{ loop.index0 }}" data-dc-sort-order/>
+        <div class="dc-select-tile__body">
+          <strong class="dc-select-tile__name">{{ category.name }}</strong>
+          {% if category.path is defined %}
+            <span class="dc-select-tile__path">{{ category.path }}</span>
+          {% endif %}
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+</div>
+
+{% include 'extension/pn_black/admin/view/template/module/pn_black/_layout_end.twig' %}

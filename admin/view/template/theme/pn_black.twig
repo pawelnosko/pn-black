@@ -1,0 +1,46 @@
+{#
+  Theme Black
+  Author: Paweł Nosko → https://pawelnosko.com/
+  Company: Design Cart → https://www.designcart.pl/
+#}
+{{ header }}{{ column_left }}
+<div id="content">
+  <div class="page-header">
+    <div class="container-fluid">
+      <div class="float-end">
+        <a href="{{ settings }}" class="btn btn-info"><i class="fa-solid fa-sliders"></i> {{ text_settings }}</a>
+        <button type="submit" form="form-theme" data-oc-toggle="ajax" class="btn btn-primary"><i class="fa-solid fa-save"></i></button>
+        <a href="{{ back }}" class="btn btn-light"><i class="fa-solid fa-reply"></i></a>
+      </div>
+      <h1>{{ heading_title }}</h1>
+      <ol class="breadcrumb">
+        {% for breadcrumb in breadcrumbs %}
+          <li class="breadcrumb-item"><a href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a></li>
+        {% endfor %}
+      </ol>
+    </div>
+  </div>
+  <div class="container-fluid">
+    <div class="card">
+      <div class="card-header"><i class="fa-solid fa-pencil"></i> {{ text_edit }}</div>
+      <div class="card-body">
+        <form id="form-theme" action="{{ save }}" method="post" data-oc-toggle="ajax">
+          <div class="row mb-3">
+            <label class="col-sm-2 col-form-label">{{ entry_status }}</label>
+            <div class="col-sm-10">
+              <div class="form-check form-switch form-switch-lg">
+                <input type="hidden" name="theme_pn_black_status" value="0"/>
+                <input type="checkbox" name="theme_pn_black_status" value="1" id="input-status" class="form-check-input"{% if theme_pn_black_status %} checked{% endif %}/>
+              </div>
+            </div>
+          </div>
+          <div class="alert alert-info mb-0">
+            Use <strong>Theme Black</strong> module settings to configure header, banner, homepage sections, footer and product card features.
+            <a href="{{ settings }}" class="alert-link">Open settings →</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{{ footer }}

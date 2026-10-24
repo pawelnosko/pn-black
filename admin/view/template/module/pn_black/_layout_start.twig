@@ -1,0 +1,63 @@
+{#
+  Theme Black
+  Author: Paweł Nosko → https://pawelnosko.com/
+  Company: Design Cart → https://www.designcart.pl/
+#}
+{{ header }}{{ column_left }}
+<div id="content" class="dc-page pn-black-section" data-dc-section="{{ section|default('') }}">
+  <div class="dc-hero">
+    <div class="dc-hero__mesh"></div>
+    <img class="dc-hero__logo" src="{{ dc_asset }}image/dc-logo-white.png" alt="" aria-hidden="true">
+    <div class="dc-hero__orb dc-hero__orb--1"></div>
+    <div class="dc-hero__orb dc-hero__orb--2"></div>
+    <div class="dc-hero__inner">
+      <div class="dc-hero__row">
+        <div class="dc-hero__brand">
+          <span class="dc-hero__icon">{{ section_icon|default('⚙️') }}</span>
+          <div>
+            <p class="dc-hero__eyebrow">Design Cart</p>
+            <h1 class="dc-hero__title">{{ section_title|default(heading_title) }}</h1>
+          </div>
+        </div>
+        {% if save is defined and save %}
+          <div class="dc-hero__actions">
+            <button type="submit" form="form-pn-black" class="dc-btn dc-btn--light"><i class="fa fa-save"></i> {{ text_save }}</button>
+            {% if back is defined and back %}
+              <a href="{{ back }}" class="dc-btn dc-btn--ghost"><i class="fa fa-arrow-left"></i></a>
+            {% endif %}
+          </div>
+        {% endif %}
+      </div>
+      <ul class="dc-hero__bc">
+        {% for breadcrumb in breadcrumbs %}
+          <li>{% if breadcrumb.href %}<a href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a>{% else %}{{ breadcrumb.text }}{% endif %}</li>
+        {% endfor %}
+        {% if section_title is defined %}
+          <li>{{ section_title }}</li>
+        {% endif %}
+      </ul>
+    </div>
+  </div>
+
+  <div class="dc-page__wrap">
+    <div class="dc-form-card">
+      <div class="dc-interface" id="dcToysInterface">
+        <form id="form-pn-black" class="dc-form dc-form--full" action="{{ save }}" method="post" data-oc-toggle="ajax">
+          <div class="dc-form-card__body">
+            {% if section is defined and section and section not in ['header', 'footer', 'contact', 'account'] %}
+              {% set section_on = settings.status is not defined or settings.status == 1 or settings.status == '1' or settings.status == true %}
+              <div class="dc-section-card dc-section dc-section--visibility">
+                <div class="dc-section-card__head" style="align-items:center;">
+                  <span class="dc-section-card__icon"><i class="fa fa-eye"></i></span>
+                  <div style="flex:1;">
+                    <h3 class="dc-section-card__title" style="margin:0;">{{ text_section_visible }}</h3>
+                    <p class="text-muted mb-0" style="font-size:13px;margin-top:0.25rem;">{{ text_section_visible_help }}</p>
+                  </div>
+                  <label class="dc-toggle" title="{{ text_section_visible }}">
+                    <input type="hidden" name="module_pn_black[status]" value="0"/>
+                    <input class="dc-toggle__input" type="checkbox" name="module_pn_black[status]" value="1"{% if section_on %} checked{% endif %}/>
+                    <span class="dc-toggle__track" aria-hidden="true"></span>
+                  </label>
+                </div>
+              </div>
+            {% endif %}

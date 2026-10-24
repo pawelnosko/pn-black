@@ -1,0 +1,103 @@
+{#
+  Theme Black
+  Author: Paweł Nosko → https://pawelnosko.com/
+  Company: Design Cart → https://www.designcart.pl/
+#}
+{% import 'extension/pn_black/admin/view/template/module/pn_black/_macros.twig' as dc %}
+{% include 'extension/pn_black/admin/view/template/module/pn_black/_layout_start.twig' %}
+
+{% set about_image_thumb = image_fields.image|default(placeholder) %}
+
+<div class="dc-section-card dc-section">
+  <div class="dc-section-card__head">
+    <span class="dc-section-card__icon"><i class="fa fa-image"></i></span>
+    <div><h3 class="dc-section-card__title">{{ entry_image }}</h3></div>
+  </div>
+  <div class="dc-field">
+    <label class="dc-label">{{ entry_image }}</label>
+    {{ dc.image_manager('image', settings.image|default(''), about_image_thumb, placeholder, 'about-image') }}
+  </div>
+</div>
+
+<div class="dc-section-card dc-section">
+  <div class="dc-section-card__head">
+    <span class="dc-section-card__icon"><i class="fa fa-language"></i></span>
+    <div><h3 class="dc-section-card__title">{{ entry_title }}</h3></div>
+  </div>
+  {{ dc.multilang_fields('', [
+    { key: 'badge', label: entry_badge },
+    { key: 'title', label: entry_title },
+    { key: 'title_accent', label: entry_title_accent },
+    { key: 'title_suffix', label: entry_title_suffix },
+    { key: 'content', label: entry_content, type: 'textarea', rows: 6 },
+    { key: 'cta', label: entry_cta }
+  ], settings, languages, 'about-main') }}
+  <div class="dc-field">
+    <label class="dc-label">{{ entry_cta_link }}</label>
+    <input class="dc-input" type="text" name="module_pn_black[cta_link]" value="{{ settings.cta_link|default('') }}"/>
+  </div>
+</div>
+
+<div class="dc-section-card dc-section">
+  <div class="dc-section-card__head">
+    <span class="dc-section-card__icon"><i class="fa fa-star"></i></span>
+    <div><h3 class="dc-section-card__title">{{ entry_featured_on_image }}</h3></div>
+  </div>
+  {% set foi = settings.featured_on_image|default({}) %}
+  {{ dc.emoji_picker('[featured_on_image][icon]', foi.icon|default('🏆'), 'list', 'about-foi-icon') }}
+  <div class="dc-lang-pills">
+    {% for language in languages %}
+      {{ dc.language_pill(language, 'lang-about-foi-' ~ language.language_id, loop.first) }}
+    {% endfor %}
+  </div>
+  {% for language in languages %}
+    <div class="dc-lang-panel{% if loop.first %} dc-active{% endif %}" id="lang-about-foi-{{ language.language_id }}">
+      <div class="dc-row dc-row--2">
+        <div class="dc-field">
+          <label class="dc-label">{{ entry_title }}</label>
+          <input class="dc-input" type="text" name="module_pn_black[featured_on_image][title][{{ language.language_id }}]" value="{{ foi.title[language.language_id]|default('') }}"/>
+        </div>
+        <div class="dc-field">
+          <label class="dc-label">{{ entry_description }}</label>
+          <input class="dc-input" type="text" name="module_pn_black[featured_on_image][text][{{ language.language_id }}]" value="{{ foi.text[language.language_id]|default('') }}"/>
+        </div>
+      </div>
+    </div>
+  {% endfor %}
+</div>
+
+<div class="dc-section-card dc-section">
+  <div class="dc-section-card__head">
+    <span class="dc-section-card__icon"><i class="fa fa-check-circle"></i></span>
+    <div><h3 class="dc-section-card__title">{{ entry_feature_title }}</h3></div>
+  </div>
+  {% set features = settings.features|default([]) %}
+  {% for feature in features %}
+    {% set fidx = loop.index0 %}
+    <div class="dc-subsection">
+      <h4 class="dc-subsection__title">{{ entry_feature_title }} {{ loop.index }}</h4>
+      {{ dc.emoji_picker('[features][' ~ fidx ~ '][icon]', feature.icon|default('✓'), 'list', 'about-feature-icon-' ~ fidx) }}
+      <div class="dc-lang-pills">
+        {% for language in languages %}
+          {{ dc.language_pill(language, 'lang-about-feature-' ~ fidx ~ '-' ~ language.language_id, loop.first) }}
+        {% endfor %}
+      </div>
+      {% for language in languages %}
+        <div class="dc-lang-panel{% if loop.first %} dc-active{% endif %}" id="lang-about-feature-{{ fidx }}-{{ language.language_id }}">
+          <div class="dc-row dc-row--2">
+            <div class="dc-field">
+              <label class="dc-label">{{ entry_feature_title }}</label>
+              <input class="dc-input" type="text" name="module_pn_black[features][{{ fidx }}][title][{{ language.language_id }}]" value="{{ feature.title[language.language_id]|default('') }}"/>
+            </div>
+            <div class="dc-field">
+              <label class="dc-label">{{ entry_feature_text }}</label>
+              <input class="dc-input" type="text" name="module_pn_black[features][{{ fidx }}][text][{{ language.language_id }}]" value="{{ feature.text[language.language_id]|default('') }}"/>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% endfor %}
+</div>
+
+{% include 'extension/pn_black/admin/view/template/module/pn_black/_layout_end.twig' %}

@@ -1,0 +1,230 @@
+{#
+  Theme Black
+  Author: Paweł Nosko → https://pawelnosko.com/
+  Company: Design Cart → https://www.designcart.pl/
+#}
+{% import 'extension/pn_black/admin/view/template/module/pn_black/_macros.twig' as dc %}
+{% include 'extension/pn_black/admin/view/template/module/pn_black/_layout_start.twig' %}
+
+{% set contact_image_thumb = image_fields.image|default(placeholder) %}
+
+<div class="dc-section-card dc-section">
+  <div class="dc-section-card__head">
+    <span class="dc-section-card__icon"><i class="fa fa-image"></i></span>
+    <div><h3 class="dc-section-card__title">{{ entry_image }}</h3></div>
+  </div>
+  <div class="dc-field">
+    <label class="dc-label">{{ entry_image }}</label>
+    {{ dc.image_manager('image', settings.image|default(''), contact_image_thumb, placeholder, 'contact-image') }}
+  </div>
+</div>
+
+<div class="dc-section-card dc-section">
+  <div class="dc-section-card__head">
+    <span class="dc-section-card__icon"><i class="fa fa-header"></i></span>
+    <div><h3 class="dc-section-card__title">{{ entry_hero }}</h3></div>
+  </div>
+  {{ dc.multilang_fields('', [
+    { key: 'eyebrow', label: entry_badge },
+    { key: 'title', label: entry_title },
+    { key: 'title_accent', label: entry_title_accent },
+    { key: 'description', label: entry_description, type: 'textarea', rows: 4 },
+    { key: 'meta_hours', label: entry_meta_hours },
+    { key: 'meta_time', label: entry_meta_time },
+    { key: 'meta_reply', label: entry_meta_reply },
+    { key: 'image_badge', label: entry_image_badge }
+  ], settings, languages, 'contact-hero') }}
+</div>
+
+<div class="dc-section-card dc-section">
+  <div class="dc-section-card__head">
+    <span class="dc-section-card__icon"><i class="fa fa-th-large"></i></span>
+    <div><h3 class="dc-section-card__title">{{ entry_channels }}</h3></div>
+    <div class="dc-section-card__actions">
+      <button type="button" class="dc-btn dc-btn--light" data-dc-add-item="channels" data-dc-template="channel-template"><i class="fa fa-plus"></i> {{ text_add_channel }}</button>
+    </div>
+  </div>
+
+  <div class="dc-accordion dc-accordion--sortable" id="channels-accordion" data-dc-accordion-list="channels" data-dc-reindex="module_pn_black[channels]">
+    {% set channels = settings.channels|default([]) %}
+    {% for channel in channels %}
+      {% set idx = loop.index0 %}
+      <div class="dc-accordion__item{% if loop.first %} dc-open{% endif %}" data-dc-accordion-item data-dc-index="{{ idx }}">
+        <div class="dc-accordion__header-row">
+          <span class="dc-sort-handle dc-accordion__handle" title="{{ text_drag }}"><i class="fa fa-bars"></i></span>
+          <button type="button" class="dc-accordion__trigger" data-dc-accordion-trigger aria-expanded="{{ loop.first ? 'true' : 'false' }}">
+            <span class="dc-accordion__icon"><i class="fa fa-envelope"></i></span>
+            <span class="dc-accordion__title">
+              {{ channel.number|default('%02d'|format(idx + 1)) }}
+              <span class="dc-accordion__sub">{{ channel.value|default('') }}</span>
+            </span>
+            <svg class="dc-accordion__chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <button type="button" class="dc-btn dc-btn--ghost dc-btn--danger" data-dc-remove-item><i class="fa fa-trash"></i></button>
+        </div>
+        <div class="dc-accordion__panel">
+          <div class="dc-accordion__content">
+            <div class="dc-accordion__body">
+              <div class="dc-row dc-row--2">
+                <div class="dc-field">
+                  <label class="dc-label">{{ entry_number }}</label>
+                  <input class="dc-input" type="text" name="module_pn_black[channels][{{ idx }}][number]" value="{{ channel.number|default('%02d'|format(idx + 1)) }}"/>
+                </div>
+                <div class="dc-field">
+                  <label class="dc-label">{{ entry_value }}</label>
+                  <input class="dc-input" type="text" name="module_pn_black[channels][{{ idx }}][value]" value="{{ channel.value|default('') }}" placeholder="email@ or +48…"/>
+                </div>
+              </div>
+              <div class="dc-lang-pills">
+                {% for language in languages %}
+                  {{ dc.language_pill(language, 'lang-contact-channel-' ~ idx ~ '-' ~ language.language_id, loop.first) }}
+                {% endfor %}
+              </div>
+              {% for language in languages %}
+                <div class="dc-lang-panel{% if loop.first %} dc-active{% endif %}" id="lang-contact-channel-{{ idx }}-{{ language.language_id }}">
+                  <div class="dc-row dc-row--2">
+                    <div class="dc-field">
+                      <label class="dc-label">{{ entry_title }}</label>
+                      <input class="dc-input" type="text" name="module_pn_black[channels][{{ idx }}][title][{{ language.language_id }}]" value="{{ channel.title[language.language_id]|default('') }}"/>
+                    </div>
+                    <div class="dc-field">
+                      <label class="dc-label">{{ entry_description }}</label>
+                      <input class="dc-input" type="text" name="module_pn_black[channels][{{ idx }}][description][{{ language.language_id }}]" value="{{ channel.description[language.language_id]|default('') }}"/>
+                    </div>
+                  </div>
+                </div>
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+</div>
+
+<template id="channel-template">
+  <div class="dc-accordion__item dc-open" data-dc-accordion-item data-dc-index="__INDEX__">
+    <div class="dc-accordion__header-row">
+      <span class="dc-sort-handle dc-accordion__handle" title="{{ text_drag }}"><i class="fa fa-bars"></i></span>
+      <button type="button" class="dc-accordion__trigger" data-dc-accordion-trigger aria-expanded="true">
+        <span class="dc-accordion__icon"><i class="fa fa-envelope"></i></span>
+        <span class="dc-accordion__title">
+          New channel
+          <span class="dc-accordion__sub">{{ entry_value }}</span>
+        </span>
+        <svg class="dc-accordion__chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <button type="button" class="dc-btn dc-btn--ghost dc-btn--danger" data-dc-remove-item><i class="fa fa-trash"></i></button>
+    </div>
+    <div class="dc-accordion__panel">
+      <div class="dc-accordion__content">
+        <div class="dc-accordion__body">
+          <div class="dc-row dc-row--2">
+            <div class="dc-field">
+              <label class="dc-label">{{ entry_number }}</label>
+              <input class="dc-input" type="text" name="module_pn_black[channels][__INDEX__][number]" value=""/>
+            </div>
+            <div class="dc-field">
+              <label class="dc-label">{{ entry_value }}</label>
+              <input class="dc-input" type="text" name="module_pn_black[channels][__INDEX__][value]" value="" placeholder="email@ or +48…"/>
+            </div>
+          </div>
+          <div class="dc-lang-pills">
+            {% for language in languages %}
+              {{ dc.language_pill(language, 'lang-contact-channel-__INDEX__-' ~ language.language_id, loop.first) }}
+            {% endfor %}
+          </div>
+          {% for language in languages %}
+            <div class="dc-lang-panel{% if loop.first %} dc-active{% endif %}" id="lang-contact-channel-__INDEX__-{{ language.language_id }}">
+              <div class="dc-row dc-row--2">
+                <div class="dc-field">
+                  <label class="dc-label">{{ entry_title }}</label>
+                  <input class="dc-input" type="text" name="module_pn_black[channels][__INDEX__][title][{{ language.language_id }}]" value=""/>
+                </div>
+                <div class="dc-field">
+                  <label class="dc-label">{{ entry_description }}</label>
+                  <input class="dc-input" type="text" name="module_pn_black[channels][__INDEX__][description][{{ language.language_id }}]" value=""/>
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<div class="dc-section-card dc-section">
+  <div class="dc-section-card__head">
+    <span class="dc-section-card__icon"><i class="fa fa-envelope-o"></i></span>
+    <div><h3 class="dc-section-card__title">{{ entry_form }}</h3></div>
+  </div>
+  {{ dc.multilang_fields('', [
+    { key: 'form_eyebrow', label: entry_badge },
+    { key: 'form_title', label: entry_title },
+    { key: 'form_title_accent', label: entry_title_accent },
+    { key: 'form_description', label: entry_description, type: 'textarea', rows: 3 },
+    { key: 'form_privacy_note', label: entry_form_privacy_note },
+    { key: 'form_privacy', label: entry_rodo, type: 'textarea', rows: 3 },
+    { key: 'form_button', label: entry_button },
+    { key: 'form_message_placeholder', label: entry_placeholder },
+    { key: 'form_subjects', label: entry_form_subjects, type: 'textarea', rows: 8 }
+  ], settings, languages, 'contact-form') }}
+  <p class="dc-help">{{ help_form_subjects }}</p>
+</div>
+
+<div class="dc-section-card dc-section">
+  <div class="dc-section-card__head">
+    <span class="dc-section-card__icon"><i class="fa fa-building"></i></span>
+    <div><h3 class="dc-section-card__title">{{ entry_studio }}</h3></div>
+  </div>
+  {{ dc.multilang_fields('', [
+    { key: 'studio_eyebrow', label: entry_badge },
+    { key: 'studio_title', label: entry_title },
+    { key: 'studio_description', label: entry_description, type: 'textarea', rows: 4 },
+    { key: 'studio_address_label', label: entry_studio_address_label },
+    { key: 'studio_address', label: entry_studio_address, type: 'textarea', rows: 3 },
+    { key: 'studio_appointments_label', label: entry_studio_appointments_label },
+    { key: 'studio_appointments', label: entry_studio_appointments, type: 'textarea', rows: 3 },
+    { key: 'studio_cta', label: entry_cta },
+    { key: 'map_label', label: entry_map_label },
+    { key: 'map_coords', label: entry_map_coords }
+  ], settings, languages, 'contact-studio') }}
+  <div class="dc-field">
+    <label class="dc-label">{{ entry_cta_link }}</label>
+    <input class="dc-input" type="text" name="module_pn_black[studio_cta_link]" value="{{ settings.studio_cta_link|default('') }}" placeholder="mailto:…"/>
+  </div>
+</div>
+
+<div class="dc-section-card dc-section">
+  <div class="dc-section-card__head">
+    <span class="dc-section-card__icon"><i class="fa fa-map-marker"></i></span>
+    <div><h3 class="dc-section-card__title">{{ entry_google_maps }}</h3></div>
+  </div>
+  <div class="dc-field">
+    <label class="dc-label">{{ entry_google_maps_api_key }}</label>
+    <input class="dc-input" type="text" name="module_pn_black[google_maps_api_key]" value="{{ settings.google_maps_api_key|default('') }}" autocomplete="off"/>
+    <p class="dc-help">{{ help_google_maps_api_key }}</p>
+  </div>
+  <div class="dc-row dc-row--3">
+    <div class="dc-field">
+      <label class="dc-label">{{ entry_map_lat }}</label>
+      <input class="dc-input" type="text" name="module_pn_black[map_lat]" value="{{ settings.map_lat|default('52.2297') }}"/>
+    </div>
+    <div class="dc-field">
+      <label class="dc-label">{{ entry_map_lng }}</label>
+      <input class="dc-input" type="text" name="module_pn_black[map_lng]" value="{{ settings.map_lng|default('21.0122') }}"/>
+    </div>
+    <div class="dc-field">
+      <label class="dc-label">{{ entry_map_zoom }}</label>
+      <input class="dc-input" type="number" min="1" max="20" name="module_pn_black[map_zoom]" value="{{ settings.map_zoom|default('14') }}"/>
+    </div>
+  </div>
+  <div class="dc-field">
+    <label class="dc-label">{{ entry_snazzy_styles }}</label>
+    <textarea class="dc-input" rows="12" name="module_pn_black[snazzy_styles]" placeholder='[{"featureType":"all","stylers":[{"saturation":-100}]}]'>{{ settings.snazzy_styles|default('') }}</textarea>
+    <p class="dc-help">{{ help_snazzy_styles }}</p>
+  </div>
+</div>
+
+{% include 'extension/pn_black/admin/view/template/module/pn_black/_layout_end.twig' %}
