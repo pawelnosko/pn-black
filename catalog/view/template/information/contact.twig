@@ -1,0 +1,285 @@
+{#
+  Theme Black
+  Author: Paweł Nosko → https://pawelnosko.com/
+  Company: Design Cart → https://www.designcart.pl/
+#}
+{% set lid = pn_black_language_id %}
+{% set cfg = pn_black.contact|default({}) %}
+{% set img = cfg.image|default('catalog/pn_black/auth.jpg') %}
+{% if img and img|slice(0, 6) != 'image/' and img|slice(0, 4) != 'http' %}
+  {% set img_src = 'image/' ~ img %}
+{% else %}
+  {% set img_src = img|default('image/catalog/pn_black/auth.jpg') %}
+{% endif %}
+{% set channels = cfg.channels|default([]) %}
+{% set subjects_raw = cfg.form_subjects[lid]|default("Select a subject\nAn existing order\nProduct information\nReturns & exchanges\nPrivate appointment\nPress & partnerships\nOther") %}
+{% set subjects = subjects_raw|split('\n') %}
+{% set map_key = cfg.google_maps_api_key|default('') %}
+{% set map_lat = cfg.map_lat|default('52.2297') %}
+{% set map_lng = cfg.map_lng|default('21.0122') %}
+{% set map_zoom = cfg.map_zoom|default('14') %}
+{{ header }}
+<div id="information-contact" class="pn-contact">
+  {% include 'extension/pn_black/catalog/view/template/common/breadcrumb.twig' %}
+
+  <section class="pn-contact-hero">
+    <div class="pn-contact-hero__copy">
+      <p class="pn-eyebrow gold-text">{{ cfg.eyebrow[lid]|default('Client services / Warsaw') }}</p>
+      <div class="pn-contact-hero__main">
+        <h1 class="pn-contact-hero__title">
+          {{ cfg.title[lid]|default("Let's") }}<br/>
+          <em>{{ cfg.title_accent[lid]|default('talk.') }}</em>
+        </h1>
+        <p class="pn-contact-hero__text">{{ cfg.description[lid]|default('Whether you need advice, order assistance or would like to arrange a private appointment, our client team is here to help.') }}</p>
+      </div>
+      <div class="pn-contact-hero__meta">
+        {% if cfg.meta_hours[lid] %}<span>{{ cfg.meta_hours[lid] }}</span>{% endif %}
+        {% if cfg.meta_time[lid] %}<span>{{ cfg.meta_time[lid] }}</span>{% endif %}
+        {% if cfg.meta_reply[lid] %}<span class="gold-text">{{ cfg.meta_reply[lid] }}</span>{% endif %}
+      </div>
+    </div>
+    <div class="pn-contact-hero__media">
+      <img src="{{ img_src }}" alt="{{ heading_title|e('html_attr') }}"/>
+      {% if cfg.image_badge[lid] %}
+        <div class="pn-contact-hero__badge gold-outline">{{ cfg.image_badge[lid] }}</div>
+      {% endif %}
+    </div>
+  </section>
+
+  {% if channels %}
+    <section class="pn-contact-channels">
+      <div class="pn-contact-channels__grid">
+        {% for channel in channels %}
+          {% set value = channel.value|default('') %}
+          {% set href = value %}
+          {% if '@' in value %}
+            {% set href = 'mailto:' ~ value %}
+          {% else %}
+            {% set digits = value|replace({' ': '', '+': '', '-': '', '(': '', ')': ''}) %}
+            {% if digits matches '/^[0-9]+$/' %}
+              {% set href = 'tel:' ~ value|replace({' ': ''}) %}
+            {% endif %}
+          {% endif %}
+          <article class="pn-contact-channel">
+            <span class="pn-contact-channel__no gold-text">{{ channel.number|default('%02d'|format(loop.index)) }}</span>
+            <div>
+              <h2 class="pn-contact-channel__title">{{ channel.title[lid]|default('') }}</h2>
+              {% if value %}
+                <a href="{{ href }}" class="pn-contact-channel__value gold-link">{{ value }}</a>
+              {% endif %}
+              {% if channel.description[lid] %}
+                <p class="pn-contact-channel__desc">{{ channel.description[lid] }}</p>
+              {% endif %}
+            </div>
+          </article>
+        {% endfor %}
+      </div>
+    </section>
+  {% endif %}
+
+  <section class="pn-contact-form-section">
+    <div class="pn-contact-form-aside">
+      <div class="pn-contact-form-aside__sticky">
+        <p class="pn-eyebrow gold-text">{{ cfg.form_eyebrow[lid]|default('Send an enquiry') }}</p>
+        <h2 class="pn-contact-form-aside__title">
+          {{ cfg.form_title[lid]|default('How can we') }}<br/>
+          <em>{{ cfg.form_title_accent[lid]|default('help you?') }}</em>
+        </h2>
+        <p class="pn-contact-form-aside__text">{{ cfg.form_description[lid]|default('Share a few details below. Your message will be directed to the right member of our team.') }}</p>
+        <div class="pn-contact-form-aside__note">
+          <svg aria-hidden="true" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="5" y="10" width="14" height="11" rx="1"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
+          <span>{{ cfg.form_privacy_note[lid]|default('Your information is handled privately') }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="pn-contact-form-panel">
+      <form id="form-contact" class="pn-auth-form" action="{{ send }}" method="post" data-oc-toggle="ajax">
+        <input type="hidden" name="name" id="input-name" value="{{ name }}"/>
+        <input type="hidden" name="enquiry" id="input-enquiry" value=""/>
+
+        <div class="pn-auth-grid">
+          <label class="pn-field">
+            <span class="pn-field__label">{{ cfg.label_firstname[lid]|default('First name') }} <span class="gold-text">*</span></span>
+            <input type="text" name="firstname" id="input-firstname" class="pn-field__input" required autocomplete="given-name"/>
+            <div id="error-name" class="pn-field__error"></div>
+          </label>
+          <label class="pn-field">
+            <span class="pn-field__label">{{ cfg.label_lastname[lid]|default('Last name') }} <span class="gold-text">*</span></span>
+            <input type="text" name="lastname" id="input-lastname" class="pn-field__input" required autocomplete="family-name"/>
+          </label>
+          <label class="pn-field">
+            <span class="pn-field__label">{{ cfg.label_email[lid]|default(entry_email) }} <span class="gold-text">*</span></span>
+            <input type="email" name="email" value="{{ email }}" id="input-email" class="pn-field__input" required autocomplete="email"/>
+            <div id="error-email" class="pn-field__error"></div>
+          </label>
+          <label class="pn-field">
+            <span class="pn-field__label">
+              <span>{{ cfg.label_telephone[lid]|default('Telephone') }}</span>
+              <span class="pn-field__hint">{{ cfg.label_optional[lid]|default('Optional') }}</span>
+            </span>
+            <input type="tel" name="telephone" id="input-telephone" class="pn-field__input" autocomplete="tel"/>
+          </label>
+          <label class="pn-field pn-field--full">
+            <span class="pn-field__label">{{ cfg.label_subject[lid]|default('What can we help with?') }} <span class="gold-text">*</span></span>
+            <span class="pn-field__select-wrap">
+              <select name="enquiry_type" id="input-enquiry-type" class="pn-field__input pn-field__select" required>
+                {% for subject in subjects %}
+                  {% set subject = subject|trim %}
+                  {% if subject %}
+                    <option value="{{ subject|e('html_attr') }}"{% if loop.first %} disabled selected{% endif %}>{{ subject }}</option>
+                  {% endif %}
+                {% endfor %}
+              </select>
+            </span>
+          </label>
+          <label class="pn-field pn-field--full">
+            <span class="pn-field__label">
+              <span>{{ cfg.label_order[lid]|default('Order number') }}</span>
+              <span class="pn-field__hint">{{ cfg.label_order_hint[lid]|default('If applicable') }}</span>
+            </span>
+            <input type="text" name="order_id" id="input-order-id" class="pn-field__input" placeholder="{{ cfg.order_placeholder[lid]|default('e.g. #1051') }}"/>
+          </label>
+          <label class="pn-field pn-field--full">
+            <span class="pn-field__label">{{ cfg.label_message[lid]|default(entry_enquiry) }} <span class="gold-text">*</span></span>
+            <textarea name="message" rows="7" id="input-message" class="pn-field__input" required placeholder="{{ cfg.form_message_placeholder[lid]|default('Tell us how we can help') }}"></textarea>
+            <div id="error-enquiry" class="pn-field__error"></div>
+          </label>
+        </div>
+
+        {% if cfg.form_privacy[lid] %}
+          <div class="pn-auth-checks">
+            <label class="pn-check">
+              <input type="checkbox" name="privacy" value="1" class="pn-check__input" required/>
+              <span class="pn-check__box" aria-hidden="true"></span>
+              <span class="pn-check__label">{{ cfg.form_privacy[lid]|raw }}</span>
+            </label>
+          </div>
+        {% endif %}
+
+        {{ captcha }}
+        <div id="error-captcha" class="pn-field__error"></div>
+
+        <button type="submit" class="pn-btn pn-btn--black pn-auth-submit">
+          {{ cfg.form_button[lid]|default(button_submit) }}
+          <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h16M14 6l6 6-6 6"/></svg>
+        </button>
+      </form>
+    </div>
+  </section>
+
+  <section class="pn-contact-studio">
+    <div class="pn-contact-map" id="pn-contact-map"
+         data-lat="{{ map_lat|e('html_attr') }}"
+         data-lng="{{ map_lng|e('html_attr') }}"
+         data-zoom="{{ map_zoom|e('html_attr') }}"
+         data-key="{{ map_key|e('html_attr') }}"
+         data-styles="{{ cfg.snazzy_styles|default('[]')|e('html_attr') }}">
+      <div class="pn-contact-map__fallback" id="pn-contact-map-fallback">
+        <span class="pn-contact-map__label">{{ cfg.map_label[lid]|default('Warsaw / Śródmieście') }}</span>
+        <span class="pn-contact-map__pin gold-surface"></span>
+        <span class="pn-contact-map__coords">{{ cfg.map_coords[lid]|default('52.2297° N, 21.0122° E') }}</span>
+      </div>
+      <div id="pn-contact-map-canvas" class="pn-contact-map__canvas" hidden></div>
+    </div>
+
+    <div class="pn-contact-studio__copy">
+      <p class="pn-eyebrow gold-text">{{ cfg.studio_eyebrow[lid]|default('Visit the studio') }}</p>
+      <h2 class="pn-contact-studio__title">{{ cfg.studio_title[lid]|default('A private appointment.') }}</h2>
+      <p class="pn-contact-studio__text">{{ cfg.studio_description[lid]|default('Discover the collection in a quiet, personal setting. Studio visits include dedicated styling advice and access to selected pieces not available online.') }}</p>
+      <div class="pn-contact-studio__grid">
+        <div>
+          <p class="pn-contact-studio__label">{{ cfg.studio_address_label[lid]|default('Address') }}</p>
+          <p class="pn-contact-studio__value">{{ (cfg.studio_address[lid]|default(address|default('')))|nl2br }}</p>
+        </div>
+        <div>
+          <p class="pn-contact-studio__label">{{ cfg.studio_appointments_label[lid]|default('Appointments') }}</p>
+          <p class="pn-contact-studio__value">{{ (cfg.studio_appointments[lid]|default(open|default('')))|nl2br }}</p>
+        </div>
+      </div>
+      {% if cfg.studio_cta[lid] %}
+        <a href="{{ cfg.studio_cta_link|default('#') }}" class="gold-link pn-contact-studio__cta">
+          {{ cfg.studio_cta[lid] }}
+          <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h16M14 6l6 6-6 6"/></svg>
+        </a>
+      {% endif %}
+    </div>
+  </section>
+</div>
+<script>
+(function () {
+  var form = document.getElementById('form-contact');
+  if (form) {
+    form.addEventListener('submit', function () {
+      var first = (document.getElementById('input-firstname') || {}).value || '';
+      var last = (document.getElementById('input-lastname') || {}).value || '';
+      var phone = (document.getElementById('input-telephone') || {}).value || '';
+      var subject = (document.getElementById('input-enquiry-type') || {}).value || '';
+      var orderId = (document.getElementById('input-order-id') || {}).value || '';
+      var message = (document.getElementById('input-message') || {}).value || '';
+      var nameField = document.getElementById('input-name');
+      var enquiryField = document.getElementById('input-enquiry');
+      var fullName = (first + ' ' + last).trim();
+
+      if (nameField) {
+        nameField.value = fullName.slice(0, 32);
+      }
+
+      if (enquiryField) {
+        var parts = [];
+        if (subject) parts.push('Subject: ' + subject);
+        if (phone) parts.push('Telephone: ' + phone);
+        if (orderId) parts.push('Order: ' + orderId);
+        if (parts.length) parts.push('');
+        parts.push(message);
+        enquiryField.value = parts.join('\n');
+      }
+    }, true);
+  }
+
+  var root = document.getElementById('pn-contact-map');
+  if (!root) return;
+
+  var key = root.getAttribute('data-key') || '';
+  if (!key) return;
+
+  var canvas = document.getElementById('pn-contact-map-canvas');
+  var fallback = document.getElementById('pn-contact-map-fallback');
+
+  window.pnContactMapInit = function () {
+    var lat = parseFloat(root.getAttribute('data-lat')) || 52.2297;
+    var lng = parseFloat(root.getAttribute('data-lng')) || 21.0122;
+    var zoom = parseInt(root.getAttribute('data-zoom'), 10) || 14;
+    var styles = [];
+
+    try {
+      styles = JSON.parse(root.getAttribute('data-styles') || '[]');
+    } catch (e) {
+      styles = [];
+    }
+
+    if (fallback) fallback.hidden = true;
+    if (canvas) canvas.hidden = false;
+
+    var map = new google.maps.Map(canvas, {
+      center: { lat: lat, lng: lng },
+      zoom: zoom,
+      disableDefaultUI: true,
+      zoomControl: true,
+      styles: Array.isArray(styles) ? styles : []
+    });
+
+    new google.maps.Marker({
+      position: { lat: lat, lng: lng },
+      map: map
+    });
+  };
+
+  var script = document.createElement('script');
+  script.src = 'https://maps.googleapis.com/maps/api/js?key=' + encodeURIComponent(key) + '&callback=pnContactMapInit';
+  script.async = true;
+  script.defer = true;
+  document.head.appendChild(script);
+})();
+</script>
+{{ footer }}

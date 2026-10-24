@@ -1,0 +1,245 @@
+{#
+  Theme Black — shared product listing (category / search / special / manufacturer)
+  Author: Paweł Nosko → https://pawelnosko.com/
+  Company: Design Cart → https://www.designcart.pl/
+
+  Optional vars:
+    listing_id, listing_eyebrow, listing_title_html, listing_description,
+    listing_image, show_subcats, show_search_form
+#}
+{% set lid = pn_black_language_id %}
+{% set list_cfg = pn_black.category|default({}) %}
+{% set listing_id = listing_id|default('product-listing') %}
+{% set show_subcats = show_subcats|default(false) %}
+{% set show_search_form = show_search_form|default(false) %}
+{% set show_hero_media = show_hero_media|default(true) %}
+{% set title_words = heading_title|striptags|split(' ') %}
+{% set current_sort = '' %}
+{% for sorts_item in sorts|default([]) %}
+  {% if sorts_item.value == sort ~ '-' ~ order %}
+    {% set current_sort = sorts_item.text %}
+  {% endif %}
+{% endfor %}
+{% set hero_image = listing_image|default(thumb|default('')) %}
+{% if not hero_image %}
+  {% set hero_image = 'image/catalog/pn_black/white-dress.jpg' %}
+{% elseif hero_image|slice(0, 6) != 'image/' and hero_image|slice(0, 4) != 'http' and hero_image|slice(0, 1) != '/' %}
+  {% set hero_image = 'image/' ~ hero_image %}
+{% endif %}
+
+<div id="{{ listing_id }}">
+  <section class="pn-cat-hero">
+    <div class="pn-cat-hero-copy">
+      {% include 'extension/pn_black/catalog/view/template/common/breadcrumb.twig' %}
+
+      <div class="pn-cat-hero-main">
+        <p class="pn-eyebrow gold-text">{{ listing_eyebrow|default(list_cfg.eyebrow[lid]|default('Edition 01') ~ ' — ' ~ heading_title) }}</p>
+        <h1 class="pn-cat-title">
+          {% if listing_title_html is defined and listing_title_html %}
+            {{ listing_title_html|raw }}
+          {% elseif title_words|length > 1 %}
+            {{ title_words|slice(0, title_words|length - 1)|join(' ') }}<br/><em>{{ title_words|last }}</em>
+          {% else %}
+            {{ heading_title }}
+          {% endif %}
+        </h1>
+      </div>
+
+      <div class="pn-cat-desc-row">
+        <div class="pn-cat-desc">
+          {% if listing_description is defined and listing_description %}
+            {{ listing_description|raw }}
+          {% elseif description and not show_search_form %}
+            {{ description }}
+          {% else %}
+            <p>{{ list_cfg.description[lid]|default('Considered silhouettes, precise tailoring and tactile fabrics. A wardrobe designed beyond the season.') }}</p>
+          {% endif %}
+        </div>
+        {% if products %}
+          <span class="pn-cat-count">{{ products|length }} {{ list_cfg.objects_label[lid]|default('objects') }}</span>
+        {% endif %}
+      </div>
+    </div>
+
+    {% if show_hero_media %}
+      <div class="pn-cat-media">
+        <img src="{{ hero_image }}" alt="{{ heading_title|striptags|e('html_attr') }}"/>
+        <div class="pn-cat-badge gold-outline">{{ heading_title|striptags }} / {{ 'now'|date('Y') }}</div>
+      </div>
+    {% endif %}
+  </section>
+
+  <section class="pn-listing">
+    {{ content_top }}
+
+    {% if show_search_form %}
+      <div class="pn-search-panel">
+        <div class="pn-search-panel__grid">
+          <div class="pn-search-panel__field">
+            <label class="pn-search-panel__label" for="input-search">{{ entry_search }}</label>
+            <input type="text" name="search" value="{{ search }}" placeholder="{{ text_keyword }}" id="input-search" class="pn-search-panel__input"/>
+            <label class="pn-search-panel__check">
+              <input type="checkbox" name="description" value="1" id="input-description"{% if description %} checked{% endif %}/>
+              <span>{{ entry_description }}</span>
+            </label>
+          </div>
+          <div class="pn-search-panel__field">
+            <label class="pn-search-panel__label" for="input-category">{{ text_category }}</label>
+            <select name="category_id" id="input-category" class="pn-search-panel__select">
+              <option value="0">{{ text_category }}</option>
+              {% for category_1 in categories %}
+                <option value="{{ category_1.category_id }}"{% if category_1.category_id == category_id %} selected{% endif %}>{{ category_1.name }}</option>
+                {% for category_2 in category_1.children %}
+                  <option value="{{ category_2.category_id }}"{% if category_2.category_id == category_id %} selected{% endif %}>&nbsp;&nbsp;&nbsp;{{ category_2.name }}</option>
+                  {% for category_3 in category_2.children %}
+                    <option value="{{ category_3.category_id }}"{% if category_3.category_id == category_id %} selected{% endif %}>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{ category_3.name }}</option>
+                  {% endfor %}
+                {% endfor %}
+              {% endfor %}
+            </select>
+            <label class="pn-search-panel__check">
+              <input type="checkbox" name="sub_category" value="1" id="input-sub-category"{% if sub_category %} checked{% endif %}/>
+              <span>{{ text_sub_category }}</span>
+            </label>
+          </div>
+        </div>
+        <div class="pn-search-panel__actions">
+          <button type="button" id="button-search" class="pn-btn pn-btn--gold">{{ button_search }}</button>
+        </div>
+      </div>
+    {% endif %}
+
+    <div class="pn-toolbar">
+      {% if column_left %}
+        <button type="button" class="pn-toolbar-label pn-toolbar-label--mobile" data-pn-filters-toggle><span class="pn-toggle-sign">+</span> {{ list_cfg.filters_label[lid]|default('Filters') }}</button>
+        <p class="pn-toolbar-label pn-toolbar-label--desktop">{{ list_cfg.filters_label[lid]|default('Filters') }}</p>
+      {% else %}
+        <p class="pn-toolbar-label">{{ heading_title }}</p>
+      {% endif %}
+
+      <div class="pn-toolbar-right">
+        {% if compare is defined and compare %}
+          <a href="{{ compare }}" class="pn-toolbar-compare" id="compare-total">{{ text_compare }}</a>
+        {% endif %}
+        {% if limits %}
+          <details class="pn-sort pn-sort--limit">
+            <summary><span><span class="pn-sort-muted">{{ list_cfg.show_label[lid]|default('Show') }}:</span> {{ limit }}</span><span class="pn-chevron" aria-hidden="true"></span></summary>
+            <div class="pn-sort-menu">
+              {% for limits_item in limits %}
+                <a href="{{ limits_item.href }}"{% if limits_item.value == limit %} class="is-active"{% endif %}>{{ limits_item.text }}</a>
+              {% endfor %}
+            </div>
+          </details>
+        {% endif %}
+        {% if sorts %}
+          <details class="pn-sort">
+            <summary><span><span class="pn-sort-muted">{{ list_cfg.sort_label[lid]|default('Sort') }}:</span> {{ current_sort }}</span><span class="pn-chevron" aria-hidden="true"></span></summary>
+            <div class="pn-sort-menu">
+              {% for sorts_item in sorts %}
+                <a href="{{ sorts_item.href }}"{% if sorts_item.value == sort ~ '-' ~ order %} class="is-active"{% endif %}>{{ sorts_item.text }}</a>
+              {% endfor %}
+            </div>
+          </details>
+        {% endif %}
+      </div>
+    </div>
+
+    {% if show_subcats and categories %}
+      <div class="pn-subcats">
+        {% for category in categories %}
+          {% if category.href is defined %}
+            <a href="{{ category.href }}">{{ category.name }}</a>
+          {% endif %}
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    <div class="pn-listing-layout{% if column_left %} pn-listing-layout--sidebar{% endif %}">
+      {% if column_left %}
+        <aside class="pn-sidebar">{{ column_left }}</aside>
+      {% endif %}
+
+      <div>
+        {% if products %}
+          {% if results %}
+            <div class="pn-listing-meta"><span>{{ results }}</span></div>
+          {% endif %}
+          <div class="pn-grid{% if not column_left %} pn-grid--wide{% endif %}">
+            {% for product in products %}
+              {{ product }}
+            {% endfor %}
+          </div>
+
+          <div class="pn-listing-end">
+            <span class="pn-listing-line"><span></span></span>
+            <div class="pn-pagination-wrap">{{ pagination }}</div>
+          </div>
+        {% else %}
+          <p class="pn-empty">{{ text_no_results|default(text_empty|default('No products found.')) }}</p>
+          {% if continue %}
+            <p class="pn-empty-actions"><a href="{{ continue }}" class="pn-btn pn-btn--gold">{{ button_continue|default('Continue') }}</a></p>
+          {% endif %}
+        {% endif %}
+
+        {{ column_right }}
+      </div>
+    </div>
+
+    {{ content_bottom }}
+  </section>
+</div>
+<script>
+$(function () {
+  $('[data-pn-filters-toggle]').on('click', function () {
+    var open = !$('.pn-sidebar').hasClass('is-open');
+
+    $('.pn-sidebar').toggleClass('is-open', open);
+    $(this).find('.pn-toggle-sign').text(open ? '−' : '+');
+  });
+
+  $(document).on('click', function (event) {
+    $('details.pn-sort[open]').each(function () {
+      if (!$(event.target).closest(this).length) {
+        this.removeAttribute('open');
+      }
+    });
+  });
+
+  {% if show_search_form %}
+  $('#button-search').on('click', function () {
+    var url = 'index.php?route=product/search&language={{ language }}';
+    var search = $('#input-search').val();
+
+    if (search) {
+      url += '&search=' + encodeURIComponent(search);
+    }
+
+    var category_id = $('#input-category').prop('value');
+
+    if (category_id > 0) {
+      url += '&category_id=' + encodeURIComponent(category_id);
+    }
+
+    if ($('#input-sub-category:checked').prop('value')) {
+      url += '&sub_category=1';
+    }
+
+    if ($('#input-description:checked').prop('value')) {
+      url += '&description=1';
+    }
+
+    location = url;
+  });
+
+  $('#input-search').on('keydown', function (e) {
+    if (e.keyCode == 13) {
+      $('#button-search').trigger('click');
+    }
+  });
+
+  $('#input-category').on('change', function () {
+    $('#input-sub-category').prop('disabled', this.value == '0');
+  }).trigger('change');
+  {% endif %}
+});
+</script>

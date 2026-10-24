@@ -1,0 +1,122 @@
+{#
+  Theme Black
+  Author: Paweł Nosko → https://pawelnosko.com/
+  Company: Design Cart → https://www.designcart.pl/
+#}
+{{ header }}
+<div id="cms-blog-list" class="pn-blog">
+  {% include 'extension/pn_black/catalog/view/template/common/breadcrumb.twig' %}
+
+  <header class="pn-blog-hero">
+    <div class="pn-blog-hero__copy">
+      <p class="pn-eyebrow gold-text">Journal</p>
+      <h1 class="pn-blog-hero__title">{{ heading_title }}</h1>
+      {% if description %}
+        <div class="pn-blog-hero__text">{{ description }}</div>
+      {% endif %}
+    </div>
+    {% if image %}
+      <div class="pn-blog-hero__media">
+        <img src="{{ image }}" alt="{{ heading_title|e('html_attr') }}" loading="lazy"/>
+      </div>
+    {% endif %}
+  </header>
+
+  <div class="pn-blog-body">
+    <div id="content" class="pn-blog-main">
+      {{ content_top }}
+
+      <div class="pn-blog-toolbar">
+        <div class="pn-blog-search">
+          <label class="pn-field pn-blog-search__field">
+            <span class="pn-field__label">{{ entry_search }}</span>
+            <input type="text" name="search" value="{{ search }}" placeholder="{{ entry_search }}" id="input-search" class="pn-field__input"/>
+          </label>
+          {% if topics %}
+            <label class="pn-field pn-blog-search__topic">
+              <span class="pn-field__label">{{ text_refine }}</span>
+              <span class="pn-field__select-wrap">
+                <select name="topic_id" id="input-topic" class="pn-field__input pn-field__select">
+                  <option value="">{{ text_all }}</option>
+                  {% for topic in topics %}
+                    <option value="{{ topic.topic_id }}"{% if topic.topic_id == topic_id %} selected{% endif %}>{{ topic.name }}</option>
+                  {% endfor %}
+                </select>
+              </span>
+            </label>
+          {% endif %}
+          <button type="button" id="button-search" class="pn-btn pn-btn--black">{{ button_search }}</button>
+        </div>
+
+        <label class="pn-field pn-blog-sort">
+          <span class="pn-field__label">{{ text_sort }}</span>
+          <span class="pn-field__select-wrap">
+            <select id="input-sort" class="pn-field__input pn-field__select" onchange="location = this.value;">
+              {% for sorts in sorts %}
+                <option value="{{ sorts.href }}"{% if sorts.value == '%s-%s'|format(sort, order) %} selected{% endif %}>{{ sorts.text }}</option>
+              {% endfor %}
+            </select>
+          </span>
+        </label>
+      </div>
+
+      {% if articles %}
+        <div class="pn-posts pn-blog-posts">
+          {% for article in articles %}
+            <article class="pn-post">
+              {% if article.image %}
+                <a href="{{ article.href }}" class="pn-post-media" tabindex="-1" aria-hidden="true">
+                  <img src="{{ article.image }}" alt="" loading="lazy"/>
+                </a>
+              {% else %}
+                <a href="{{ article.href }}" class="pn-post-media pn-post-media--empty" tabindex="-1" aria-hidden="true"></a>
+              {% endif %}
+              <div class="pn-post-meta">
+                <span>{{ article.author }}</span>
+                <time>{{ article.date_added }}</time>
+              </div>
+              <h2 class="pn-post-title"><a href="{{ article.href }}">{{ article.name }}</a></h2>
+              {% if article.description %}
+                <p class="pn-post-excerpt">{{ article.description }}</p>
+              {% endif %}
+              <a href="{{ article.href }}" class="pn-arrow-link">
+                {{ button_continue }}
+                <svg class="pn-icon" aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h16M14 6l6 6-6 6"/></svg>
+              </a>
+            </article>
+          {% endfor %}
+        </div>
+
+        <div class="pn-blog-foot">
+          <div class="pn-pagination-wrap">{{ pagination }}</div>
+          {% if results %}<p class="pn-blog-results">{{ results }}</p>{% endif %}
+        </div>
+      {% else %}
+        <p class="pn-blog-empty">{{ text_no_results }}</p>
+      {% endif %}
+
+      {{ content_bottom }}
+    </div>
+  </div>
+</div>
+<script type="text/javascript"><!--
+$('#button-search').on('click', function() {
+  var url = 'index.php?route=cms/blog&language={{ language }}';
+  var search = $('#input-search').val();
+  if (search) {
+    url += '&search=' + encodeURIComponent(search);
+  }
+  var topic_id = $('#input-topic').val();
+  if (topic_id > 0) {
+    url += '&topic_id=' + topic_id;
+  }
+  location = url;
+});
+
+$('#input-search').on('keydown', function(e) {
+  if (e.keyCode == 13) {
+    $('#button-search').trigger('click');
+  }
+});
+//--></script>
+{{ footer }}

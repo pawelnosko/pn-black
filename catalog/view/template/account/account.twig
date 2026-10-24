@@ -1,0 +1,113 @@
+{#
+  Theme Black
+  Author: Paweł Nosko → https://pawelnosko.com/
+  Company: Design Cart → https://www.designcart.pl/
+#}
+{{ header }}
+<div id="account-account" class="pn-account-page">
+  {% include 'extension/pn_black/catalog/view/template/common/breadcrumb.twig' %}
+
+  <div class="pn-account-layout">
+    {{ column_left }}
+
+    <div id="content" class="pn-account-content">
+      {{ content_top }}
+
+      {% if success %}
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+          {{ success }}
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+      {% endif %}
+
+      <header class="pn-account-head">
+        <p class="pn-eyebrow gold-text">Account</p>
+        <h1 class="pn-account-title">{{ heading_title }}</h1>
+      </header>
+
+      <section class="pn-account-section">
+        <h2>{{ text_my_account }}</h2>
+        <div class="pn-account-tiles">
+          <a href="{{ edit }}" class="pn-account-tile">
+            <span class="no">01</span>
+            <span class="label">{{ text_edit }}</span>
+          </a>
+          <a href="{{ password }}" class="pn-account-tile">
+            <span class="no">02</span>
+            <span class="label">{{ text_password }}</span>
+          </a>
+          <a href="{{ payment_method }}" class="pn-account-tile">
+            <span class="no">03</span>
+            <span class="label">{{ text_payment_method }}</span>
+          </a>
+          <a href="{{ address }}" class="pn-account-tile">
+            <span class="no">04</span>
+            <span class="label">{{ text_address }}</span>
+          </a>
+          <a href="{{ wishlist }}" class="pn-account-tile">
+            <span class="no">05</span>
+            <span class="label">{{ text_wishlist }}</span>
+          </a>
+        </div>
+      </section>
+
+      <section class="pn-account-section">
+        <h2>{{ text_my_orders }}</h2>
+        <div class="pn-account-tiles">
+          <a href="{{ order }}" class="pn-account-tile">
+            <span class="no">01</span>
+            <span class="label">{{ text_order }}</span>
+          </a>
+          <a href="{{ subscription }}" class="pn-account-tile">
+            <span class="no">02</span>
+            <span class="label">{{ text_subscription }}</span>
+          </a>
+          <a href="{{ download }}" class="pn-account-tile">
+            <span class="no">03</span>
+            <span class="label">{{ text_download }}</span>
+          </a>
+          {% if reward %}
+            <a href="{{ reward }}" class="pn-account-tile">
+              <span class="no">04</span>
+              <span class="label">{{ text_reward }}</span>
+            </a>
+          {% endif %}
+          <a href="{{ return }}" class="pn-account-tile">
+            <span class="no">05</span>
+            <span class="label">{{ text_return }}</span>
+          </a>
+          <a href="{{ transaction }}" class="pn-account-tile">
+            <span class="no">06</span>
+            <span class="label">{{ text_transaction }}</span>
+          </a>
+        </div>
+      </section>
+
+      {% if affiliate %}
+        <section class="pn-account-section">
+          <h2>{{ text_my_affiliate }}</h2>
+          <div class="pn-account-tiles">
+            {% if not tracking %}
+              <a href="{{ affiliate }}" class="pn-account-tile"><span class="no">01</span><span class="label">{{ text_affiliate_add }}</span></a>
+            {% else %}
+              <a href="{{ affiliate }}" class="pn-account-tile"><span class="no">01</span><span class="label">{{ text_affiliate_edit }}</span></a>
+              <a href="{{ tracking }}" class="pn-account-tile"><span class="no">02</span><span class="label">{{ text_tracking }}</span></a>
+            {% endif %}
+          </div>
+        </section>
+      {% endif %}
+
+      <section class="pn-account-section">
+        <h2>{{ text_my_newsletter }}</h2>
+        <div class="pn-account-tiles">
+          <a href="{{ newsletter }}" class="pn-account-tile"><span class="no">01</span><span class="label">{{ text_newsletter }}</span></a>
+        </div>
+      </section>
+
+      {{ content_bottom }}
+    </div>
+
+    {{ column_right }}
+  </div>
+</div>
+{{ footer }}

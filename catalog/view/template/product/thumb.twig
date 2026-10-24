@@ -1,0 +1,60 @@
+{#
+  Theme Black
+  Author: Paweł Nosko → https://pawelnosko.com/
+  Company: Design Cart → https://www.designcart.pl/
+
+  Product card. Used by OpenCart listings (product/thumb controller) and by the
+  home collection (include with: ratio, group, add_label, category …).
+#}
+{% set lid = pn_black_language_id|default(language_id|default(0)) %}
+{% set pn_add_label = add_label|default(pn_black.product.add_label[lid]|default(button_cart|default('Add to bag'))) %}
+{% set pn_cart_action = cart_add|default(add_to_cart|default('index.php?route=checkout/cart.add')) %}
+{% set pn_cart_info = cart|default('index.php?route=common/cart.info') %}
+{% set pn_wishlist_action = wishlist_add|default(add_to_wishlist|default('index.php?route=account/wishlist.add')) %}
+{% set pn_label = badge|default('') %}
+{% if not pn_label and special %}
+  {% set pn_label = text_sale|default('Sale') %}
+{% endif %}
+<article class="product-card{% if reveal|default(false) %} reveal{% endif %}{% if ratio %} {{ ratio }}{% endif %}"{% if group %} data-pn-group="{{ group }}"{% endif %}>
+  <div class="product-card-media">
+    <a href="{{ href }}" tabindex="-1" aria-hidden="true">
+      <img src="{{ thumb }}" alt="{{ name|striptags|e('html_attr') }}" loading="lazy"/>
+    </a>
+
+    {% if pn_label %}
+      <span class="product-card-label gold-surface">{{ pn_label }}</span>
+    {% endif %}
+
+    <form method="post" data-oc-toggle="ajax" class="product-card-wishlist-form">
+      <input type="hidden" name="product_id" value="{{ product_id }}"/>
+      <button type="submit" formaction="{{ pn_wishlist_action }}" class="product-card-wish" aria-label="{{ button_wishlist|default('Add to wishlist') }}" title="{{ button_wishlist|default('Add to wishlist') }}">
+        <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20.8 5.8a5.4 5.4 0 0 0-7.7 0L12 6.9l-1.1-1.1a5.4 5.4 0 0 0-7.7 7.7L12 22l8.8-8.5a5.4 5.4 0 0 0 0-7.7Z"/></svg>
+      </button>
+    </form>
+
+    <form method="post" data-oc-toggle="ajax" data-oc-load="{{ pn_cart_info }}" data-oc-target="#cart" class="product-card-bag-form">
+      <input type="hidden" name="product_id" value="{{ product_id }}"/>
+      <input type="hidden" name="quantity" value="{{ minimum|default(1) }}"/>
+      <button type="submit" formaction="{{ pn_cart_action }}" class="product-card-add">{{ pn_add_label }}</button>
+    </form>
+  </div>
+
+  <div class="product-card-info">
+    <div>
+      {% if category or manufacturer %}
+        <p class="product-card-cat">{{ category|default(manufacturer) }}</p>
+      {% endif %}
+      <h3 class="product-card-name"><a href="{{ href }}">{{ name }}</a></h3>
+    </div>
+    {% if price %}
+      <p class="product-card-price">
+        {% if special %}
+          <span class="product-card-price-new">{{ special }}</span>
+          <span class="product-card-price-old">{{ price }}</span>
+        {% else %}
+          {{ price }}
+        {% endif %}
+      </p>
+    {% endif %}
+  </div>
+</article>

@@ -1,0 +1,266 @@
+<!--
+  Theme Black
+  Author: Paweł Nosko → https://pawelnosko.com/
+  Company: Design Cart → https://www.designcart.pl/
+-->
+{% set lid = pn_black_language_id %}
+{% set product_cfg = pn_black.product|default({}) %}
+{% set product_section_on = product_cfg.status is not defined or product_cfg.status == 1 or product_cfg.status == '1' %}
+{% set product_features = product_section_on ? product_cfg.features|default([]) : [] %}
+{% set add_label = product_cfg.add_label[lid]|default('Add to bag') %}
+{% set lead_text = description|striptags|trim %}
+{% set icon_heart %}<svg class="pn-icon" aria-hidden="true" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20.8 5.8a5.4 5.4 0 0 0-7.7 0L12 6.9l-1.1-1.1a5.4 5.4 0 0 0-7.7 7.7L12 22l8.8-8.5a5.4 5.4 0 0 0 0-7.7Z"/></svg>{% endset %}
+{{ header }}
+<div id="product-product">
+  {% include 'extension/pn_black/catalog/view/template/common/breadcrumb.twig' %}
+
+  <section class="pn-product">
+    <div class="pn-gallery">
+      {% if thumb or popup %}
+        <div class="pn-gallery-item pn-gallery-item--main">
+          <img src="{{ popup|default(thumb) }}" alt="{{ heading_title }}" id="product-main-image"/>
+        </div>
+      {% endif %}
+      {% for image in images %}
+        <div class="pn-gallery-item">
+          <img src="{{ image.popup|default(image.thumb) }}" alt="{{ heading_title }} — {{ loop.index + 1 }}" loading="lazy"/>
+        </div>
+      {% endfor %}
+    </div>
+
+    <div class="pn-info">
+      <div class="pn-info-inner">
+        <div class="pn-info-top">
+          <div>
+            <p class="pn-eyebrow pn-eyebrow--sm gold-text" style="margin:0;">{{ manufacturer|default(model) }}{% if model and manufacturer %} / {{ model }}{% endif %}</p>
+            <h1 class="pn-info-title">{{ heading_title }}</h1>
+            <p class="pn-info-price">
+              {% if special %}
+                <span class="product-card-price-new">{{ special }}</span><s>{{ price }}</s>
+              {% elseif price %}
+                {{ price }}
+              {% endif %}
+            </p>
+          </div>
+          <form method="post" data-oc-toggle="ajax" class="pn-fav-form">
+            <input type="hidden" name="product_id" value="{{ product_id }}"/>
+            <button type="submit" formaction="index.php?route=account/wishlist.add&amp;language={{ language }}" class="pn-fav" aria-label="{{ text_wishlist|default('Add to wishlist') }}">{{ icon_heart }}</button>
+          </form>
+        </div>
+
+        {% if lead_text %}
+          <p class="pn-info-lead">{{ lead_text|slice(0, 240) }}{% if lead_text|length > 240 %}…{% endif %}</p>
+        {% endif %}
+
+        <form id="form-product" method="post">
+          {% if options or subscription_plans %}
+            <div class="pn-options">
+              {% for option in options %}
+                <div class="pn-option{% if option.required %} required{% endif %}">
+                  {% if option.type == 'select' %}
+                    <label for="input-option-{{ option.product_option_id }}" class="pn-option-label">{{ option.name }}{% if option.required %} <span class="req">*</span>{% endif %}</label>
+                    <select name="option[{{ option.product_option_id }}]" id="input-option-{{ option.product_option_id }}" class="form-select">
+                      <option value="">{{ text_select|default('--- Please Select ---') }}</option>
+                      {% for option_value in option.product_option_value %}
+                        <option value="{{ option_value.product_option_value_id }}">{{ option_value.name }}{% if option_value.price %} ({{ option_value.price_prefix }}{{ option_value.price }}){% endif %}</option>
+                      {% endfor %}
+                    </select>
+                  {% endif %}
+
+                  {% if option.type == 'radio' or option.type == 'checkbox' %}
+                    <p class="pn-option-label">{{ option.name }}{% if option.required %} <span class="req">*</span>{% endif %}</p>
+                    <div id="input-option-{{ option.product_option_id }}" class="pn-chips">
+                      {% for option_value in option.product_option_value %}
+                        <div class="pn-chip">
+                          <input type="{{ option.type }}" name="option[{{ option.product_option_id }}]{% if option.type == 'checkbox' %}[]{% endif %}" value="{{ option_value.product_option_value_id }}" id="input-option-value-{{ option_value.product_option_value_id }}"/>
+                          <label for="input-option-value-{{ option_value.product_option_value_id }}">
+                            {% if option_value.image %}<img src="{{ option_value.image }}" alt="{{ option_value.name }}"/>{% endif %}
+                            {{ option_value.name }}{% if option_value.price %} ({{ option_value.price_prefix }}{{ option_value.price }}){% endif %}
+                          </label>
+                        </div>
+                      {% endfor %}
+                    </div>
+                  {% endif %}
+
+                  {% if option.type == 'text' %}
+                    <label for="input-option-{{ option.product_option_id }}" class="pn-option-label">{{ option.name }}{% if option.required %} <span class="req">*</span>{% endif %}</label>
+                    <input type="text" name="option[{{ option.product_option_id }}]" value="{{ option.value }}" placeholder="{{ option.name }}" id="input-option-{{ option.product_option_id }}" class="form-control"/>
+                  {% endif %}
+
+                  {% if option.type == 'textarea' %}
+                    <label for="input-option-{{ option.product_option_id }}" class="pn-option-label">{{ option.name }}{% if option.required %} <span class="req">*</span>{% endif %}</label>
+                    <textarea name="option[{{ option.product_option_id }}]" rows="5" placeholder="{{ option.name }}" id="input-option-{{ option.product_option_id }}" class="form-control">{{ option.value }}</textarea>
+                  {% endif %}
+
+                  {% if option.type == 'file' %}
+                    <p class="pn-option-label">{{ option.name }}{% if option.required %} <span class="req">*</span>{% endif %}</p>
+                    <button type="button" id="button-upload-{{ option.product_option_id }}" data-oc-toggle="upload" data-oc-url="{{ upload }}" data-oc-target="#input-option-{{ option.product_option_id }}" data-oc-size-max="{{ config_file_max_size }}" data-oc-size-error="{{ error_upload_size }}" class="btn btn-primary btn-sm">{{ button_upload|default('Upload') }}</button>
+                    <input type="hidden" name="option[{{ option.product_option_id }}]" value="" id="input-option-{{ option.product_option_id }}"/>
+                  {% endif %}
+
+                  {% if option.type == 'date' %}
+                    <label for="input-option-{{ option.product_option_id }}" class="pn-option-label">{{ option.name }}{% if option.required %} <span class="req">*</span>{% endif %}</label>
+                    <input type="date" name="option[{{ option.product_option_id }}]" value="{{ option.value }}" id="input-option-{{ option.product_option_id }}" class="form-control"/>
+                  {% endif %}
+
+                  {% if option.type == 'time' %}
+                    <label for="input-option-{{ option.product_option_id }}" class="pn-option-label">{{ option.name }}{% if option.required %} <span class="req">*</span>{% endif %}</label>
+                    <input type="time" name="option[{{ option.product_option_id }}]" value="{{ option.value }}" id="input-option-{{ option.product_option_id }}" class="form-control"/>
+                  {% endif %}
+
+                  {% if option.type == 'datetime' %}
+                    <label for="input-option-{{ option.product_option_id }}" class="pn-option-label">{{ option.name }}{% if option.required %} <span class="req">*</span>{% endif %}</label>
+                    <input type="datetime-local" name="option[{{ option.product_option_id }}]" value="{{ option.value }}" id="input-option-{{ option.product_option_id }}" class="form-control"/>
+                  {% endif %}
+
+                  <div id="error-option-{{ option.product_option_id }}" class="invalid-feedback"></div>
+                </div>
+              {% endfor %}
+
+              {% if subscription_plans %}
+                <div class="pn-option required">
+                  <label for="input-subscription" class="pn-option-label">{{ text_subscription|default('Subscription') }} <span class="req">*</span></label>
+                  <select name="subscription_plan_id" id="input-subscription" class="form-select">
+                    <option value="">{{ text_select|default('--- Please Select ---') }}</option>
+                    {% for subscription_plan in subscription_plans %}
+                      <option value="{{ subscription_plan.subscription_plan_id }}">{{ subscription_plan.name }}</option>
+                    {% endfor %}
+                  </select>
+                  {% for subscription_plan in subscription_plans %}
+                    <div id="subscription-description-{{ subscription_plan.subscription_plan_id }}" class="form-text subscription d-none">{{ subscription_plan.description }}</div>
+                  {% endfor %}
+                  <div id="error-subscription" class="invalid-feedback"></div>
+                </div>
+              {% endif %}
+            </div>
+          {% endif %}
+
+          <div class="pn-add-row">
+            <div class="pn-qty">
+              <button type="button" aria-label="−" onclick="var i=document.getElementById('input-quantity'); i.value=Math.max({{ minimum|default(1) }}, (parseInt(i.value, 10) || 1) - 1);">−</button>
+              <input type="text" name="quantity" value="{{ minimum|default(1) }}" data-min="{{ minimum|default(1) }}" id="input-quantity" aria-label="Quantity"/>
+              <button type="button" aria-label="+" onclick="var i=document.getElementById('input-quantity'); i.value=(parseInt(i.value, 10) || 1) + 1;">+</button>
+            </div>
+            <button type="submit" id="button-cart" class="pn-add-btn">{{ add_label }}{% if special or price %} — {{ special ?: price }}{% endif %}</button>
+          </div>
+          <input type="hidden" name="product_id" value="{{ product_id }}" id="input-product-id"/>
+          <div id="error-quantity" class="invalid-feedback"></div>
+          {% if minimum > 1 %}
+            <div class="alert alert-warning mt-3 mb-0 py-2 px-3 small">{{ text_minimum }}</div>
+          {% endif %}
+        </form>
+
+        <p class="pn-stock">{{ stock ?: product_cfg.stock_note[lid]|default('In stock — dispatches within 24 hours') }}</p>
+
+        <div class="pn-accordion">
+          {% if lead_text %}
+            <details class="filter-group" open>
+              <summary>{{ tab_description|default('Description') }}<span class="filter-plus">+</span></summary>
+              <div class="pn-acc-body">{{ description }}</div>
+            </details>
+          {% endif %}
+
+          {% if attribute_groups %}
+            <details class="filter-group">
+              <summary>{{ tab_attribute|default('Specifications') }}<span class="filter-plus">+</span></summary>
+              <div class="pn-acc-body">
+                {% for attribute_group in attribute_groups %}
+                  {% for attribute in attribute_group.attribute %}
+                    <div class="pn-spec"><span>{{ attribute.name }}</span><span>{{ attribute.text }}</span></div>
+                  {% endfor %}
+                {% endfor %}
+              </div>
+            </details>
+          {% endif %}
+
+          {% for feature in product_features %}
+            {% if feature.title[lid] %}
+              <details class="filter-group">
+                <summary>{{ feature.title[lid] }}<span class="filter-plus">+</span></summary>
+                <div class="pn-acc-body">{{ feature.text[lid]|default('') }}</div>
+              </details>
+            {% endif %}
+          {% endfor %}
+
+          {% if review_status %}
+            <details class="filter-group">
+              <summary>{{ tab_review|default('Reviews') }}<span class="filter-plus">+</span></summary>
+              <div class="pn-acc-body" id="tab-review">{{ review }}</div>
+            </details>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </section>
+
+  {% if products %}
+    <section class="pn-related">
+      <div class="pn-related-head">
+        <div>
+          <p class="pn-eyebrow gold-text">{{ product_cfg.related_badge[lid]|default('Complete the edit') }}</p>
+          <h2>{{ product_cfg.related_title[lid]|default('You may also like') }}</h2>
+        </div>
+      </div>
+      <div class="pn-related-grid">
+        {% for product in products %}
+          {{ product }}
+        {% endfor %}
+      </div>
+    </section>
+  {% endif %}
+
+  {{ content_bottom }}
+</div>
+<script>
+$('#input-subscription').on('change', function() {
+  $('.subscription').addClass('d-none');
+  $('#subscription-description-' + $(this).val()).removeClass('d-none');
+});
+
+$('#form-product').on('submit', function(e) {
+  e.preventDefault();
+
+  $.ajax({
+    url: 'index.php?route=checkout/cart.add&language={{ language }}',
+    type: 'post',
+    data: $('#form-product').serialize(),
+    dataType: 'json',
+    contentType: 'application/x-www-form-urlencoded',
+    cache: false,
+    processData: false,
+    beforeSend: function() {
+      $('#button-cart').button('loading');
+    },
+    complete: function() {
+      $('#button-cart').button('reset');
+    },
+    success: function(json) {
+      $('#form-product').find('.is-invalid').removeClass('is-invalid');
+      $('#form-product').find('.invalid-feedback').removeClass('d-block');
+
+      if (json.error) {
+        for (var key in json.error) {
+          if (key === 'warning') {
+            showModalMessage('danger', json.error.warning);
+            continue;
+          }
+
+          $('#input-' + key.replaceAll('_', '-')).addClass('is-invalid').find('.form-control, .form-select, .form-check-input, .form-check-label').addClass('is-invalid');
+          $('#error-' + key.replaceAll('_', '-')).html(json.error[key]).addClass('d-block');
+        }
+      }
+
+      if (json.success) {
+        refreshSlideCart(function() {
+          setTimeout(openCart, 300);
+          setTimeout(updateCartCount, 300);
+        });
+      }
+    },
+    error: function(xhr, ajaxOptions, thrownError) {
+      console.log(thrownError + '\r\n' + xhr.statusText + '\r\n' + xhr.responseText);
+    }
+  });
+});
+</script>
+{{ footer }}

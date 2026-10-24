@@ -1,0 +1,76 @@
+{#
+  Theme Black
+  Author: Paweł Nosko → https://pawelnosko.com/
+  Company: Design Cart → https://www.designcart.pl/
+#}
+<div id="cart" class="pn-cart">
+  <div class="cart-loader"><i class="fa-solid fa-spinner fa-spin"></i></div>
+
+  {% if products or vouchers %}
+    <div class="pn-cart-lines">
+      {% for product in products %}
+        <div class="pn-cart-line">
+          <a href="{{ product.href }}" class="pn-cart-thumb">
+            {% if product.thumb %}
+              <img src="{{ product.thumb }}" alt="{{ product.name|striptags|e('html_attr') }}" title="{{ product.name|striptags|e('html_attr') }}"/>
+            {% endif %}
+          </a>
+          <div>
+            <div class="pn-cart-line-top">
+              <div>
+                <a href="{{ product.href }}" class="pn-cart-name">{{ product.name }}</a>
+                {% if product.option or product.recurring %}
+                  <span class="pn-cart-options">
+                    {% for option in product.option %}
+                      {{ option.name }}: {{ option.value }}{% if not loop.last %} · {% endif %}
+                    {% endfor %}
+                    {% if product.recurring %}<br/>{{ text_recurring }} {{ product.recurring }}{% endif %}
+                  </span>
+                {% endif %}
+              </div>
+              <span class="pn-cart-line-price">{{ product.total }}</span>
+            </div>
+            <div class="pn-cart-line-bottom">
+              <div class="quantity-group" data-cart-id="{{ product.cart_id }}">
+                <button class="btn-qty" data-type="minus" type="button" aria-label="−">−</button>
+                <input type="text" class="qty-input" value="{{ product.quantity }}" inputmode="numeric" aria-label="Quantity"/>
+                <button class="btn-qty" data-type="plus" type="button" aria-label="+">+</button>
+              </div>
+              <button type="button" title="{{ button_remove }}" class="btn-remove" data-cart-id="{{ product.cart_id }}">{{ button_remove|default('Remove') }}</button>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+
+      {% for voucher in vouchers %}
+        <div class="pn-cart-line">
+          <span class="pn-cart-thumb"></span>
+          <div class="pn-cart-line-top">
+            <span class="pn-cart-name">{{ voucher.description }}</span>
+            <span class="pn-cart-line-price">1 × {{ voucher.amount }}</span>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+
+    <div class="pn-cart-foot">
+      <div class="pn-cart-totals">
+        {% for total in totals %}
+          <div class="pn-cart-total-row">
+            <span>{{ total.title }}</span>
+            <span>{{ total.text }}</span>
+          </div>
+        {% endfor %}
+      </div>
+      <div class="pn-cart-actions">
+        <a href="{{ checkout }}" class="pn-btn pn-btn--gold">{{ text_checkout }}</a>
+        <a href="{{ cart }}" class="pn-btn pn-btn--outline">{{ text_cart }}</a>
+      </div>
+    </div>
+  {% else %}
+    <div class="pn-cart-empty">
+      <svg class="pn-icon" aria-hidden="true" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8h14l-1 13H6L5 8Z"/><path d="M9 9V6a3 3 0 0 1 6 0v3"/></svg>
+      <p>{{ text_empty|default(text_no_results|default('Your bag is empty')) }}</p>
+    </div>
+  {% endif %}
+</div>

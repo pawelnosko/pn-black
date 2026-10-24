@@ -1,0 +1,33 @@
+{#
+  Theme Black
+  Author: Paweł Nosko → https://pawelnosko.com/
+  Company: Design Cart → https://www.designcart.pl/
+
+  Dynamic category menu (top-level + children). Used in desktop nav and mobile drawer.
+#}
+{% if categories %}
+  <ul class="pn-menu">
+    {% for category in categories %}
+      {% set has_children = category.children is defined and category.children|length > 0 %}
+      <li class="pn-menu__item{% if has_children %} has-children{% endif %}">
+        {% if has_children %}
+          <div class="pn-menu__row">
+            <a href="{{ category.href }}" class="pn-menu__link">{{ category.name }}</a>
+            <button type="button" class="pn-menu__toggle" aria-expanded="false" aria-label="{{ category.name|e('html_attr') }}">
+              <span class="pn-chevron" aria-hidden="true"></span>
+            </button>
+          </div>
+          <ul class="pn-menu__dropdown">
+            {% for child in category.children %}
+              <li class="pn-menu__item">
+                <a href="{{ child.href }}" class="pn-menu__link pn-menu__link--child">{{ child.name }}</a>
+              </li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <a href="{{ category.href }}" class="pn-menu__link">{{ category.name }}</a>
+        {% endif %}
+      </li>
+    {% endfor %}
+  </ul>
+{% endif %}

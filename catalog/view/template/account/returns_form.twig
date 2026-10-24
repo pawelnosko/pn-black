@@ -1,0 +1,148 @@
+{#
+  Theme Black
+  Author: Paweł Nosko → https://pawelnosko.com/
+  Company: Design Cart → https://www.designcart.pl/
+#}
+{{ header }}
+<div id="account-return" class="pn-returns">
+  {% include 'extension/pn_black/catalog/view/template/common/breadcrumb.twig' %}
+
+  <header class="pn-returns-heading">
+    <p class="pn-eyebrow gold-text">Aftercare</p>
+    <h1 class="pn-returns-heading__title">{{ heading_title }}</h1>
+    {% if text_description %}
+      <p class="pn-returns-heading__copy">{{ text_description }}</p>
+    {% endif %}
+  </header>
+
+  <div class="pn-returns-shell">
+    <div id="content" class="pn-returns-main">
+      {{ content_top }}
+
+      <form id="form-return" class="pn-auth-form pn-returns-form" action="{{ save }}" method="post" data-oc-toggle="ajax">
+        <div class="pn-auth-step">
+          <span class="pn-auth-step__no gold-text">01</span>
+          <span class="pn-auth-step__label">{{ text_order }}</span>
+        </div>
+
+        <div class="pn-auth-grid">
+          <label class="pn-field">
+            <span class="pn-field__label">{{ entry_order_id }} <span class="gold-text">*</span></span>
+            <input type="text" name="order_id" value="{{ order_id }}" placeholder="{{ entry_order_id }}" id="input-order-id" class="pn-field__input"/>
+            <div id="error-order-id" class="pn-field__error invalid-feedback"></div>
+          </label>
+          <label class="pn-field">
+            <span class="pn-field__label">{{ entry_date_ordered }}</span>
+            <input type="date" name="date_ordered" value="{{ date_ordered }}" placeholder="{{ entry_date_ordered }}" id="input-date-ordered" class="pn-field__input"/>
+          </label>
+        </div>
+
+        <div class="pn-auth-step">
+          <span class="pn-auth-step__no gold-text">02</span>
+          <span class="pn-auth-step__label">{{ text_customer }}</span>
+        </div>
+
+        <div class="pn-auth-grid">
+          <label class="pn-field">
+            <span class="pn-field__label">{{ entry_firstname }} <span class="gold-text">*</span></span>
+            <input type="text" name="firstname" value="{{ firstname }}" placeholder="{{ entry_firstname }}" id="input-firstname" class="pn-field__input" autocomplete="given-name"/>
+            <div id="error-firstname" class="pn-field__error invalid-feedback"></div>
+          </label>
+          <label class="pn-field">
+            <span class="pn-field__label">{{ entry_lastname }} <span class="gold-text">*</span></span>
+            <input type="text" name="lastname" value="{{ lastname }}" placeholder="{{ entry_lastname }}" id="input-lastname" class="pn-field__input" autocomplete="family-name"/>
+            <div id="error-lastname" class="pn-field__error invalid-feedback"></div>
+          </label>
+          <label class="pn-field pn-field--full">
+            <span class="pn-field__label">{{ entry_email }} <span class="gold-text">*</span></span>
+            <input type="text" name="email" value="{{ email }}" placeholder="{{ entry_email }}" id="input-email" class="pn-field__input" autocomplete="email"/>
+            <div id="error-email" class="pn-field__error invalid-feedback"></div>
+          </label>
+          {% if config_telephone_display %}
+            <label class="pn-field pn-field--full">
+              <span class="pn-field__label">{{ entry_telephone }}{% if config_telephone_required %} <span class="gold-text">*</span>{% endif %}</span>
+              <input type="text" name="telephone" value="{{ telephone }}" placeholder="{{ entry_telephone }}" id="input-telephone" class="pn-field__input" autocomplete="tel"/>
+              <div id="error-telephone" class="pn-field__error invalid-feedback"></div>
+            </label>
+          {% endif %}
+        </div>
+
+        <div class="pn-auth-step">
+          <span class="pn-auth-step__no gold-text">03</span>
+          <span class="pn-auth-step__label">{{ text_product }}</span>
+        </div>
+
+        <div class="pn-auth-grid">
+          <label class="pn-field pn-field--full">
+            <span class="pn-field__label">{{ entry_product }} <span class="gold-text">*</span></span>
+            <input type="hidden" name="product_id" value="{{ product_id }}"/>
+            <input type="text" name="product" value="{{ product }}" placeholder="{{ entry_product }}" id="input-product" class="pn-field__input"/>
+            <div id="error-product" class="pn-field__error invalid-feedback"></div>
+          </label>
+          <label class="pn-field">
+            <span class="pn-field__label">{{ entry_model }} <span class="gold-text">*</span></span>
+            <input type="text" name="model" value="{{ model }}" placeholder="{{ entry_model }}" id="input-model" class="pn-field__input"/>
+            <div id="error-model" class="pn-field__error invalid-feedback"></div>
+          </label>
+          <label class="pn-field">
+            <span class="pn-field__label">{{ entry_quantity }}</span>
+            <input type="text" name="quantity" value="1" placeholder="{{ entry_quantity }}" id="input-quantity" class="pn-field__input"/>
+          </label>
+        </div>
+
+        <div class="pn-field pn-field--full">
+          <span class="pn-field__label">{{ entry_reason }} <span class="gold-text">*</span></span>
+          <div id="input-reason" class="pn-choice-list">
+            {% for return_reason in return_reasons %}
+              <label class="pn-choice">
+                <input type="radio" name="return_reason_id" value="{{ return_reason.return_reason_id }}" id="input-return-reason-{{ return_reason.return_reason_id }}" class="pn-choice__input form-check-input"/>
+                <span class="pn-choice__label">{{ return_reason.name }}</span>
+              </label>
+            {% endfor %}
+          </div>
+          <div id="error-reason" class="pn-field__error invalid-feedback"></div>
+        </div>
+
+        <div class="pn-field pn-field--full">
+          <span class="pn-field__label">{{ entry_opened }} <span class="gold-text">*</span></span>
+          <div class="pn-choice-list pn-choice-list--inline">
+            <label class="pn-choice">
+              <input type="radio" name="opened" value="1" id="input-opened-yes" class="pn-choice__input form-check-input" checked/>
+              <span class="pn-choice__label">{{ text_yes }}</span>
+            </label>
+            <label class="pn-choice">
+              <input type="radio" name="opened" value="0" id="input-opened-no" class="pn-choice__input form-check-input"/>
+              <span class="pn-choice__label">{{ text_no }}</span>
+            </label>
+          </div>
+        </div>
+
+        <label class="pn-field pn-field--full">
+          <span class="pn-field__label">{{ entry_fault_detail }}</span>
+          <textarea name="comment" rows="5" placeholder="{{ entry_fault_detail }}" id="input-comment" class="pn-field__input"></textarea>
+        </label>
+
+        {% if captcha %}
+          <div class="pn-returns-captcha">{{ captcha }}</div>
+        {% endif %}
+
+        <div class="pn-returns-actions">
+          <a href="{{ back }}" class="pn-btn pn-btn--outline">{{ button_back }}</a>
+          <div class="pn-returns-actions__end">
+            {% if text_agree %}
+              <label class="pn-returns-agree">
+                <input type="hidden" name="agree" value="0"/>
+                <input type="checkbox" name="agree" value="1" id="input-agree" class="form-check-input"/>
+                <span>{{ text_agree }}</span>
+              </label>
+            {% endif %}
+            <button type="submit" class="pn-btn pn-btn--black">{{ button_submit }}</button>
+          </div>
+        </div>
+      </form>
+
+      {{ content_bottom }}
+    </div>
+  </div>
+</div>
+{{ footer }}

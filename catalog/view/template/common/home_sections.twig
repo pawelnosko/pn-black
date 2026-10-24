@@ -1,0 +1,306 @@
+{#
+  Theme Black
+  Author: Paweł Nosko → https://pawelnosko.com/
+  Company: Design Cart → https://www.designcart.pl/
+
+  Home sections: hero, marquee, collection, manifest, reviews, metrics, journal, newsletter.
+  Variables (module/pn_black.home): banner, marquee, collection, carousels, about,
+  reviews, blog, newsletter, language_id, language, pn_black.
+#}
+{% set lid = language_id %}
+{% set product_cfg = pn_black.product|default({}) %}
+{% set add_label = product_cfg.add_label[lid]|default('Add to bag') %}
+
+{# ── Hero ──────────────────────────────────────────────────────────────── #}
+{% set hero = banner|first %}
+{% if hero %}
+  <section class="pn-hero" id="home-hero">
+    <div class="pn-hero-copy">
+      {% if hero.badge %}
+        <p class="pn-hero-eyebrow reveal">{{ hero.badge|e }}</p>
+      {% else %}
+        <span></span>
+      {% endif %}
+
+      <div class="pn-hero-main">
+        <h1 class="pn-hero-title reveal">
+          {{ hero.title|e }}{% if hero.title_accent %}<br/><em>{{ hero.title_accent|e }}</em>{% endif %}
+        </h1>
+        {% if hero.description %}
+          <p class="pn-hero-text reveal">{{ hero.description|e }}</p>
+        {% endif %}
+        {% if hero.cta1 or hero.cta2 %}
+          <div class="pn-hero-actions reveal">
+            {% if hero.cta1 %}
+              <a href="{{ hero.cta1_link|default('#collection')|e }}" class="pn-arrow-link gold-link">
+                {{ hero.cta1|e }}
+                <svg class="pn-icon" aria-hidden="true" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h16M14 6l6 6-6 6"/></svg>
+              </a>
+            {% endif %}
+            {% if hero.cta2 %}
+              <a href="{{ hero.cta2_link|default('#')|e }}" class="pn-arrow-link pn-hero-cta-secondary">{{ hero.cta2|e }}</a>
+            {% endif %}
+          </div>
+        {% endif %}
+      </div>
+
+      <div class="pn-hero-foot reveal">
+        <span class="pn-hero-designed">{{ hero.designed_in|default('')|e }}</span>
+        {% if hero.scroll_hint %}
+          <span class="pn-hero-scroll vertical-text">{{ hero.scroll_hint|e }}</span>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="pn-hero-media reveal">
+      {% if hero.image %}
+        <img src="{{ hero.image }}" alt="{{ hero.title|e('html_attr') }} {{ hero.title_accent|e('html_attr') }}"/>
+      {% endif %}
+      {% if hero.image_badge %}
+        <div class="pn-hero-badge gold-outline">{{ hero.image_badge|e }}</div>
+      {% endif %}
+    </div>
+  </section>
+{% endif %}
+
+{# ── Marquee ───────────────────────────────────────────────────────────── #}
+{% if marquee.items %}
+  <div class="marquee" role="marquee">
+    <div class="marquee-track">
+      {% for repeat in 1..4 %}
+        <div class="pn-marquee-group"{% if repeat > 1 %} aria-hidden="true"{% endif %}>
+          {% for text in marquee.items %}
+            <span class="pn-marquee-item">{{ text|e }} <span class="pn-marquee-dot gold-surface"></span></span>
+          {% endfor %}
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+{% endif %}
+
+{# ── Collection (masonry + category filters) ───────────────────────────── #}
+{% if collection.products %}
+  {% set cards = [] %}
+  {% set used_groups = [] %}
+  {% for product in collection.products %}
+    {% set group = product.category|default('')|trim %}
+    {% if not group %}{% set group = 'other' %}{% endif %}
+    {% set cards = cards|merge([product|merge({group: group})]) %}
+    {% if group not in used_groups %}
+      {% set used_groups = used_groups|merge([group]) %}
+    {% endif %}
+  {% endfor %}
+  {% set ratios = ['pn-r-45', 'pn-r-34', 'pn-r-46', 'pn-r-11', 'pn-r-45', 'pn-r-35'] %}
+
+  <section id="collection" class="pn-section pn-collection">
+    <div class="pn-section-head reveal">
+      <div>
+        {% if collection.badge %}<p class="pn-eyebrow">{{ collection.badge|e }}</p>{% endif %}
+        <h2 class="pn-section-title">{{ collection.title|e }}</h2>
+      </div>
+      {% if used_groups|length > 1 %}
+        <div class="pn-filters" role="group" aria-label="{{ collection.title|e('html_attr') }}">
+          <button type="button" class="pn-filter is-active" data-pn-filter="all" aria-pressed="true">{{ language starts with 'pl' ? 'Wszystkie' : 'All' }}</button>
+          {% for group in used_groups %}
+            <button type="button" class="pn-filter" data-pn-filter="{{ group|e('html_attr') }}" aria-pressed="false">{{ group == 'other' ? (language starts with 'pl' ? 'Inne' : 'Other') : group|e }}</button>
+          {% endfor %}
+        </div>
+      {% endif %}
+    </div>
+
+    <div class="pn-masonry">
+      {% for card in cards %}
+        {% include 'extension/pn_black/catalog/view/template/product/thumb.twig' with card|merge({ratio: ratios[loop.index0 % 6], add_label: add_label, language_id: lid, reveal: true}) only %}
+      {% endfor %}
+    </div>
+  </section>
+{% endif %}
+
+{# ── Manifest ──────────────────────────────────────────────────────────── #}
+{% if about and (about.title[lid] or about.content[lid]) %}
+  <section class="pn-manifest" id="manifest">
+    <div class="pn-manifest-copy reveal">
+      <span class="pn-manifest-badge">{{ about.badge[lid]|default('')|e }}</span>
+      <div>
+        <p class="pn-manifest-title font-serif">
+          {{ about.title[lid]|default('')|e }}{% if about.title_accent[lid] %}<br/><em>{{ about.title_accent[lid]|e }}</em>{% endif %}{% if about.title_suffix[lid] %} {{ about.title_suffix[lid]|e }}{% endif %}
+        </p>
+        {% if about.content[lid] %}
+          <p class="pn-manifest-text">{{ about.content[lid]|e }}</p>
+        {% endif %}
+      </div>
+      {% if about.cta[lid] %}
+        <a href="{{ about.cta_link|default('#')|e }}" class="pn-arrow-link gold-link">
+          {{ about.cta[lid]|e }}
+          <svg class="pn-icon" aria-hidden="true" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h16M14 6l6 6-6 6"/></svg>
+        </a>
+      {% else %}
+        <span></span>
+      {% endif %}
+    </div>
+    <div class="pn-manifest-media reveal">
+      {% if about.image %}
+        <img src="image/{{ about.image }}" alt="{{ about.title[lid]|default('')|e('html_attr') }}" loading="lazy"/>
+      {% endif %}
+    </div>
+  </section>
+{% endif %}
+
+{# ── Reviews ───────────────────────────────────────────────────────────── #}
+{% if reviews.items %}
+  <section class="pn-reviews" id="reviews">
+    <div class="pn-section-head reveal">
+      <div>
+        {% if reviews.badge %}<p class="pn-eyebrow">{{ reviews.badge|e }}</p>{% endif %}
+        <h2 class="pn-section-title">{{ reviews.title|e }}{% if reviews.title_accent %} {{ reviews.title_accent|e }}{% endif %}</h2>
+      </div>
+      {% if reviews.rating %}
+        <div class="pn-rating">
+          <span class="pn-rating-value">{{ reviews.rating|e }}</span>
+          <div>
+            <p class="pn-rating-stars" aria-hidden="true">{% for i in 1..5 %}★{% endfor %}</p>
+            {% if reviews.based_on %}<p class="pn-rating-note">{{ reviews.based_on|e }}</p>{% endif %}
+          </div>
+        </div>
+      {% endif %}
+    </div>
+
+    <div class="pn-reviews-grid">
+      {% for review in reviews.items|slice(0, 3) %}
+        <article class="pn-review reveal">
+          <span class="pn-review-num">0{{ loop.index }} / 0{{ reviews.items|slice(0, 3)|length }}</span>
+          <blockquote class="pn-review-quote">{{ review.text|e }}</blockquote>
+          <p class="pn-review-author">{{ review.author|e }}</p>
+        </article>
+      {% endfor %}
+    </div>
+  </section>
+{% endif %}
+
+{# ── Metrics (orbits) ──────────────────────────────────────────────────── #}
+{% if metrics and metrics.items %}
+  <section class="pn-metrics" id="metrics">
+    <div class="pn-metrics-head reveal">
+      {% if metrics.badge %}<p class="pn-eyebrow">{{ metrics.badge|e }}</p>{% endif %}
+      {% if metrics.title %}<h2 class="pn-metrics-title">{{ metrics.title|e }}</h2>{% endif %}
+    </div>
+    <div class="pn-metrics-grid">
+      {% for stat in metrics.items|slice(0, 8) %}
+        <div class="metric-orbit reveal">
+          <div class="pn-metric-figure">
+            <span class="pn-metric-value">{{ stat.value|default('')|e }}</span>
+            {% if stat.suffix %}<span class="pn-metric-suffix">{{ stat.suffix|e }}</span>{% endif %}
+          </div>
+          <span class="pn-metric-rule"></span>
+          <p class="pn-metric-label">{{ stat.label|default('')|e }}</p>
+        </div>
+      {% endfor %}
+    </div>
+  </section>
+{% endif %}
+
+{# ── Journal teaser ────────────────────────────────────────────────────── #}
+{% if blog and (blog.title or blog.teaser_description) %}
+  <section class="pn-journal-teaser" id="journal-teaser">
+    <div class="pn-journal-teaser-copy reveal">
+      {% if blog.badge %}<p class="pn-eyebrow">{{ blog.badge|e }}</p>{% endif %}
+      <h2 class="pn-journal-teaser-title">{{ blog.title|e }}{% if blog.title_accent %}<br/><em>{{ blog.title_accent|e }}</em>{% endif %}</h2>
+      {% if blog.teaser_description %}
+        <p class="pn-journal-teaser-text">{{ blog.teaser_description|e }}</p>
+      {% endif %}
+      {% if blog.teaser_cta %}
+        <a href="{{ blog.all_link|default('#') }}" class="pn-arrow-link gold-link">
+          {{ blog.teaser_cta|e }}
+          <svg class="pn-icon" aria-hidden="true" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h16M14 6l6 6-6 6"/></svg>
+        </a>
+      {% endif %}
+    </div>
+    {% if blog.teaser_image %}
+      <div class="pn-journal-teaser-media reveal">
+        <img src="{{ blog.teaser_image }}" alt="{{ blog.title|e('html_attr') }}" loading="lazy"/>
+        {% if blog.teaser_badge %}
+          <div class="pn-journal-teaser-badge gold-outline">{{ blog.teaser_badge|e }}</div>
+        {% endif %}
+      </div>
+    {% endif %}
+  </section>
+{% endif %}
+
+{# ── Journal posts ─────────────────────────────────────────────────────── #}
+{% if blog.installed and blog.posts %}
+  <section class="pn-journal" id="journal">
+    <div class="pn-journal-head reveal">
+      <div>
+        {% if blog.grid_badge %}<p class="pn-eyebrow">{{ blog.grid_badge|e }}</p>{% endif %}
+        <h2 class="pn-section-title">{{ blog.grid_title|default(blog.title)|e }}</h2>
+      </div>
+      {% if blog.all_articles %}
+        <a href="{{ blog.all_link|default('#') }}" class="pn-arrow-link pn-arrow-link--ink">
+          {{ blog.all_articles|e }}
+          <svg class="pn-icon" aria-hidden="true" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h16M14 6l6 6-6 6"/></svg>
+        </a>
+      {% endif %}
+    </div>
+
+    <div class="pn-posts">
+      {% for post in blog.posts|slice(0, 3) %}
+        <article class="pn-post reveal">
+          <a href="{{ post.href }}" class="pn-post-media" tabindex="-1" aria-hidden="true">
+            {% if post.thumb %}
+              <img src="{{ post.thumb }}" alt="" loading="lazy"/>
+            {% endif %}
+          </a>
+          <div class="pn-post-meta">
+            <span>{{ post.category|default('') }}</span>
+            <time>{{ post.date }}</time>
+          </div>
+          <h3 class="pn-post-title"><a href="{{ post.href }}">{{ post.title }}</a></h3>
+          {% if post.excerpt %}
+            <p class="pn-post-excerpt">{{ post.excerpt }}</p>
+          {% endif %}
+          <a href="{{ post.href }}" class="pn-arrow-link">
+            {{ blog.read_more|default('Read more')|e }}
+            <svg class="pn-icon" aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h16M14 6l6 6-6 6"/></svg>
+          </a>
+        </article>
+      {% endfor %}
+    </div>
+  </section>
+{% endif %}
+
+{# ── Newsletter ────────────────────────────────────────────────────────── #}
+{% if newsletter %}
+  <section class="pn-newsletter" id="newsletter">
+    <div class="pn-newsletter-inner reveal">
+      {% if newsletter.badge[lid] %}<p class="pn-eyebrow">{{ newsletter.badge[lid]|e }}</p>{% endif %}
+      <h2 class="pn-newsletter-title">{{ newsletter.title[lid]|default('')|e }}</h2>
+      {% if newsletter.description[lid] %}
+        <p class="pn-newsletter-text">{{ newsletter.description[lid]|e }}</p>
+      {% endif %}
+
+      <form id="form-newsletter" class="pn-newsletter-form" method="post" action="index.php?route=extension/pn_black/module/pn_black.newsletter" novalidate>
+        <div class="pn-newsletter-row">
+          <input type="email" name="email" required autocomplete="email" aria-label="{{ newsletter.placeholder[lid]|default('Email')|e('html_attr') }}" placeholder="{{ newsletter.placeholder[lid]|default('YOUR EMAIL ADDRESS')|e('html_attr') }}"/>
+          <button type="submit">
+            {{ newsletter.button[lid]|default('Join')|e }}
+            <svg class="pn-icon" aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h16M14 6l6 6-6 6"/></svg>
+          </button>
+        </div>
+        {% if newsletter.rodo[lid] %}
+          <label class="pn-newsletter-consent">
+            <input type="checkbox" name="rodo" value="1" required/>
+            <span>{{ newsletter.rodo[lid]|e }}</span>
+          </label>
+        {% else %}
+          <input type="hidden" name="rodo" value="1"/>
+        {% endif %}
+        {% if newsletter.footer_text[lid] %}
+          <p class="pn-newsletter-note">{{ newsletter.footer_text[lid]|e }}</p>
+        {% endif %}
+        <p class="pn-newsletter-error" role="alert" hidden></p>
+      </form>
+
+      <p class="pn-newsletter-success" role="status" hidden>{{ newsletter.success[lid]|default("Thank you. You're on the list.")|e }}</p>
+    </div>
+  </section>
+{% endif %}

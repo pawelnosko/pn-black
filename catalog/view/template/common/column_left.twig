@@ -1,0 +1,12 @@
+{#
+  Theme Black
+  Author: Paweł Nosko → https://pawelnosko.com/
+  Company: Design Cart → https://www.designcart.pl/
+#}
+{% if modules %}
+<div id="column-left" class="pn-column-left">
+  {% for module in modules %}
+    {{ module }}
+  {% endfor %}
+</div>
+{% endif %}

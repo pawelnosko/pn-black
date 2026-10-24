@@ -1,0 +1,53 @@
+{#
+  Theme Black
+  Author: Paweł Nosko → https://pawelnosko.com/
+  Company: Design Cart → https://www.designcart.pl/
+#}
+{% set lid = pn_black_language_id %}
+{% set list_cfg = pn_black.category|default({}) %}
+{{ header }}
+<div id="product-manufacturer" class="pn-brands-page">
+  <section class="pn-cat-hero pn-cat-hero--solo">
+    <div class="pn-cat-hero-copy">
+      {% include 'extension/pn_black/catalog/view/template/common/breadcrumb.twig' %}
+      <div class="pn-cat-hero-main">
+        <p class="pn-eyebrow gold-text">{{ list_cfg.eyebrow[lid]|default('Edition 01') }} — {{ heading_title }}</p>
+        <h1 class="pn-cat-title">{{ heading_title }}</h1>
+      </div>
+      <div class="pn-cat-desc">
+        <p>{{ list_cfg.description[lid]|default('Houses and makers in the collection.') }}</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="pn-listing">
+    {{ content_top }}
+    {% if categories %}
+      <div class="pn-brands-index">
+        <span class="pn-brands-index__label">{{ text_index }}</span>
+        {% for category in categories %}
+          <a href="{{ category.href }}#{{ category.name }}">{{ category.name }}</a>
+        {% endfor %}
+      </div>
+      {% for category in categories %}
+        <div class="pn-brands-group" id="{{ category.name }}">
+          <h2 class="pn-brands-group__title">{{ category.name }}</h2>
+          {% if category.manufacturer %}
+            <div class="pn-brands-grid">
+              {% for manufacturer in category.manufacturer %}
+                <a href="{{ manufacturer.href }}" class="pn-brands-grid__item">{{ manufacturer.name }}</a>
+              {% endfor %}
+            </div>
+          {% endif %}
+        </div>
+      {% endfor %}
+    {% else %}
+      <p class="pn-empty">{{ text_no_results }}</p>
+      {% if continue %}
+        <p class="pn-empty-actions"><a href="{{ continue }}" class="pn-btn pn-btn--gold">{{ button_continue }}</a></p>
+      {% endif %}
+    {% endif %}
+    {{ content_bottom }}
+  </section>
+</div>
+{{ footer }}

@@ -1,0 +1,31 @@
+{#
+  Theme Black
+  Author: Paweł Nosko → https://pawelnosko.com/
+  Company: Design Cart → https://www.designcart.pl/
+#}
+{{ header }}
+<div id="information-information" class="pn-doc">
+  {% include 'extension/pn_black/catalog/view/template/common/breadcrumb.twig' %}
+
+  <div class="pn-doc-shell">
+    {{ column_left }}
+
+    <div id="content" class="pn-doc-main">
+      {{ content_top }}
+
+      <header class="pn-doc-head">
+        <p class="pn-eyebrow gold-text">Information</p>
+        <h1 class="pn-doc-title">{{ heading_title }}</h1>
+      </header>
+
+      <article class="pn-prose">
+        {{ description }}
+      </article>
+
+      {{ content_bottom }}
+    </div>
+
+    {{ column_right }}
+  </div>
+</div>
+{{ footer }}

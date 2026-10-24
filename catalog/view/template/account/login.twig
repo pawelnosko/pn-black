@@ -1,0 +1,76 @@
+{#
+  Theme Black
+  Author: Paweł Nosko → https://pawelnosko.com/
+  Company: Design Cart → https://www.designcart.pl/
+#}
+{% set lid = pn_black_language_id %}
+{% set auth = pn_black.account|default({}) %}
+{% set login_cfg = auth.login|default({}) %}
+{% set img = login_cfg.image|default('catalog/pn_black/auth.jpg') %}
+{% if img and img|slice(0, 6) != 'image/' and img|slice(0, 4) != 'http' %}
+  {% set img_src = 'image/' ~ img %}
+{% else %}
+  {% set img_src = img %}
+{% endif %}
+{{ header }}
+<div id="account-login" class="pn-auth">
+  {% include 'extension/pn_black/catalog/view/template/common/breadcrumb.twig' %}
+
+  <div class="pn-auth-split">
+    <aside class="pn-auth-media" aria-hidden="true">
+      <img src="{{ img_src }}" alt=""/>
+      <div class="pn-auth-media__shade"></div>
+      <div class="pn-auth-media__copy">
+        <p class="pn-eyebrow gold-text">{{ login_cfg.panel_eyebrow[lid]|default('Private access') }}</p>
+        <p class="pn-auth-media__title">{{ login_cfg.panel_title[lid]|default('Your world of considered objects.') }}</p>
+      </div>
+    </aside>
+
+    <div class="pn-auth-panel">
+      <div class="pn-auth-panel__inner">
+        {% if success %}
+          <div class="pn-alert pn-alert--success">{{ success }}</div>
+        {% endif %}
+        {% if error_warning %}
+          <div class="pn-alert pn-alert--error">{{ error_warning }}</div>
+        {% endif %}
+
+        <p class="pn-eyebrow gold-text">{{ login_cfg.eyebrow[lid]|default('Welcome back') }}</p>
+        <h1 class="pn-auth-title">{{ login_cfg.title[lid]|default(heading_title|default('Sign in')) }}</h1>
+        <p class="pn-auth-lead">{{ login_cfg.description[lid]|default('Access your orders, saved pieces and private benefits.') }}</p>
+
+        <form id="form-login" class="pn-auth-form" action="{{ login }}" method="post" data-oc-toggle="ajax">
+          <label class="pn-field">
+            <span class="pn-field__label">{{ entry_email }} <span class="gold-text">*</span></span>
+            <input type="email" name="email" value="{{ email }}" placeholder="{{ entry_email }}" id="input-email" class="pn-field__input" required autocomplete="email"/>
+          </label>
+
+          <label class="pn-field">
+            <span class="pn-field__label">{{ entry_password }} <span class="gold-text">*</span></span>
+            <input type="password" name="password" value="{{ password }}" placeholder="{{ entry_password }}" id="input-password" class="pn-field__input" required autocomplete="current-password"/>
+          </label>
+
+          <div class="pn-auth-meta">
+            <span></span>
+            <a href="{{ forgotten }}" class="pn-auth-link">{{ text_forgotten }}</a>
+          </div>
+
+          {% if redirect %}
+            <input type="hidden" name="redirect" value="{{ redirect }}"/>
+          {% endif %}
+
+          <button type="submit" class="pn-btn pn-btn--black pn-auth-submit">
+            {{ login_cfg.button[lid]|default(button_login) }}
+            <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h16M14 6l6 6-6 6"/></svg>
+          </button>
+        </form>
+
+        <p class="pn-auth-foot">
+          {{ login_cfg.register_prompt[lid]|default('New to NØR?') }}
+          <a href="{{ register }}" class="pn-auth-link pn-auth-link--strong">{{ login_cfg.register_label[lid]|default(text_register|default('Create an account')) }}</a>
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+{{ footer }}

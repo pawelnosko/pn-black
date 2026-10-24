@@ -1,0 +1,25 @@
+{#
+  Theme Black
+  Author: Paweł Nosko → https://pawelnosko.com/
+  Company: Design Cart → https://www.designcart.pl/
+#}
+{% if breadcrumbs %}
+<nav class="pn-breadcrumb dc-breadcrumb" aria-label="Breadcrumb">
+  <div class="pn-breadcrumb-inner">
+    {% for breadcrumb in breadcrumbs %}
+      {% set plain = breadcrumb.text|striptags|trim %}
+      {% if loop.first and plain == '' %}
+        {% set label = text_home|default('Home') %}
+      {% else %}
+        {% set label = plain %}
+      {% endif %}
+      {% if loop.last %}
+        <span class="pn-breadcrumb-current" aria-current="page">{{ label }}</span>
+      {% else %}
+        <a href="{{ breadcrumb.href }}">{{ label }}</a>
+        <span aria-hidden="true">/</span>
+      {% endif %}
+    {% endfor %}
+  </div>
+</nav>
+{% endif %}

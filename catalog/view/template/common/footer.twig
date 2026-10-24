@@ -1,0 +1,131 @@
+{#
+  Theme Black
+  Author: Paweł Nosko → https://pawelnosko.com/
+  Company: Design Cart → https://www.designcart.pl/
+#}
+{% set lid = pn_black_language_id %}
+{% set footer_cfg = pn_black.footer|default({}) %}
+{% set header_cfg = pn_black.header|default({}) %}
+{% set footer_brand = footer_cfg.brand_text|default(header_cfg.brand_text|default('')) %}
+{% set home_url = home|default('') %}
+{% set store_name = name|default(footer_brand) %}
+<footer id="footer" class="pn-footer">
+  <div class="pn-footer-top">
+    <div class="pn-footer-brand">
+      {% if footer_cfg.logo %}
+        <a href="{{ home_url }}" class="pn-footer-logo"><img src="image/{{ footer_cfg.logo }}" alt="{{ store_name|striptags|e('html_attr') }}" loading="lazy"/></a>
+      {% elseif footer_brand %}
+        <a href="{{ home_url }}" class="pn-footer-logo gold-text font-serif">{{ footer_brand|e }}</a>
+      {% else %}
+        <a href="{{ home_url }}" class="pn-footer-logo gold-text font-serif">{{ store_name|e }}</a>
+      {% endif %}
+
+      {% if footer_cfg.description[lid] %}
+        <p class="pn-footer-desc">{{ footer_cfg.description[lid]|striptags }}</p>
+      {% endif %}
+    </div>
+
+    {% if footer_cfg.socials %}
+      <div class="pn-footer-socials" aria-label="Social">
+        {% for social in footer_cfg.socials %}
+          {% set stitle = social.title|default('') %}
+          {% set sicon = social.icon|default('') %}
+          {% set surl = social.url|default('#') %}
+          {% if stitle or sicon or surl != '#' %}
+            <a href="{{ surl }}" title="{{ stitle|e('html_attr') }}"{% if surl starts with 'http' %} target="_blank" rel="noopener noreferrer"{% endif %}>
+              {% if sicon starts with 'fa' %}
+                <i class="{{ sicon|e('html_attr') }}" aria-hidden="true"></i>
+                <span class="pn-sr-only">{{ stitle|e }}</span>
+              {% elseif sicon %}
+                <img src="image/{{ sicon }}" alt="{{ stitle|e('html_attr') }}" width="20" height="20" loading="lazy"/>
+              {% else %}
+                {{ stitle|e }}
+              {% endif %}
+            </a>
+          {% endif %}
+        {% endfor %}
+      </div>
+    {% endif %}
+  </div>
+
+  <div class="pn-footer-nav">
+    {% if informations or blog %}
+      <div class="pn-footer-col">
+        <h5 class="pn-footer-col-title">{{ text_information }}</h5>
+        <ul class="list-unstyled">
+          {% if blog %}
+            <li><a href="{{ blog }}">{{ text_blog }}</a></li>
+          {% endif %}
+          {% for information in informations %}
+            <li><a href="{{ information.href }}">{{ information.title }}</a></li>
+          {% endfor %}
+        </ul>
+      </div>
+    {% endif %}
+
+    <div class="pn-footer-col">
+      <h5 class="pn-footer-col-title">{{ text_service }}</h5>
+      <ul class="list-unstyled">
+        <li><a href="{{ contact }}">{{ text_contact }}</a></li>
+        <li><a href="{{ return }}">{{ text_return }}</a></li>
+        {% if gdpr %}
+          <li><a href="{{ gdpr }}">{{ text_gdpr }}</a></li>
+        {% endif %}
+        <li><a href="{{ sitemap }}">{{ text_sitemap }}</a></li>
+      </ul>
+    </div>
+
+    <div class="pn-footer-col">
+      <h5 class="pn-footer-col-title">{{ text_extra }}</h5>
+      <ul class="list-unstyled">
+        <li><a href="{{ manufacturer }}">{{ text_manufacturer }}</a></li>
+        {% if affiliate %}
+          <li><a href="{{ affiliate }}">{{ text_affiliate }}</a></li>
+        {% endif %}
+        <li><a href="{{ special }}">{{ text_special }}</a></li>
+      </ul>
+    </div>
+
+    <div class="pn-footer-col">
+      <h5 class="pn-footer-col-title">{{ text_account }}</h5>
+      <ul class="list-unstyled">
+        <li><a href="{{ account }}">{{ text_account }}</a></li>
+        <li><a href="{{ order }}">{{ text_order }}</a></li>
+        <li><a href="{{ wishlist }}">{{ text_wishlist }}</a></li>
+        <li><a href="{{ newsletter }}">{{ text_newsletter }}</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="pn-footer-bottom">
+    <p>© {{ "now"|date("Y") }}{% if store_name %} {{ store_name|e }}{% endif %}</p>
+    <div class="pn-footer-bottom-mid">
+      {% if footer_cfg.information_terms or footer_cfg.information_privacy or footer_cfg.information_cookies %}
+        <nav class="pn-footer-legal" aria-label="Legal">
+          {% if footer_cfg.information_terms %}
+            <a href="{{ footer_cfg.information_terms }}">{{ text_terms|default('Terms & Conditions') }}</a>
+          {% endif %}
+          {% if footer_cfg.information_privacy %}
+            <a href="{{ footer_cfg.information_privacy }}">{{ text_privacy|default('Privacy Policy') }}</a>
+          {% endif %}
+          {% if footer_cfg.information_cookies %}
+            <a href="{{ footer_cfg.information_cookies }}">{{ text_cookies|default('Cookies') }}</a>
+          {% endif %}
+        </nav>
+      {% endif %}
+    </div>
+    <div class="pn-footer-bottom-copy">{{ dc_credit|raw }}</div>
+  </div>
+</footer>
+
+{{ cookie }}
+
+{% for script in scripts %}
+  {% if script.href is defined %}
+    <script src="{{ script.href }}" type="text/javascript"></script>
+  {% elseif script is not iterable %}
+    <script src="{{ script }}" type="text/javascript"></script>
+  {% endif %}
+{% endfor %}
+</body>
+</html>

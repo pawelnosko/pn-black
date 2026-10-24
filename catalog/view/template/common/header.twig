@@ -1,0 +1,237 @@
+{#
+  Theme Black
+  Author: Paweł Nosko → https://pawelnosko.com/
+  Company: Design Cart → https://www.designcart.pl/
+#}
+{% set lid = pn_black_language_id %}
+{% set header_cfg = pn_black.header|default({}) %}
+{% set cart_label = header_cfg.cart_label[lid]|default('Your bag') %}
+{% set account_label = header_cfg.account_label[lid]|default('Account') %}
+{% set search_label = header_cfg.search_button[lid]|default('Search') %}
+{% set menu_label = header_cfg.menu_label[lid]|default('Menu') %}
+{% set site_name = name|striptags|replace({'&amp;': '&', '&quot;': '"', '&#039;': "'", '&lt;': '<', '&gt;': '>'}) %}
+<!DOCTYPE html>
+<html dir="{{ direction }}" lang="{{ lang }}">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="theme-color" content="#000000">
+  <title>{{ title }}</title>
+  <base href="{{ base }}"/>
+
+  {% if description %}
+    <meta name="description" content="{{ description }}"/>
+  {% endif %}
+  {% if keywords %}
+    <meta name="keywords" content="{{ keywords }}"/>
+  {% endif %}
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=Italiana&display=swap" rel="stylesheet">
+
+  <script src="extension/pn_black/catalog/view/javascript/jquery.js"></script>
+  <link href="extension/pn_black/catalog/view/bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen"/>
+  <script src="extension/pn_black/catalog/view/bootstrap/js/popper.js" type="text/javascript"></script>
+  <script src="extension/pn_black/catalog/view/bootstrap/js/bootstrap.min.js" type="text/javascript"></script>
+  <link href="extension/pn_black/catalog/view/fontawesome/css/all.min.css" rel="stylesheet" type="text/css"/>
+  <link href="extension/pn_black/catalog/view/stylesheet/stylesheet.css?v=20261024i" rel="stylesheet">
+  <script src="extension/pn_black/catalog/view/javascript/theme.js?v=20261024i" type="text/javascript"></script>
+  <noscript><style>.reveal{opacity:1!important;transform:none!important}.product-card-add{transform:none!important}</style></noscript>
+
+  {% for style in styles %}
+    {% if style.href is defined %}
+      <link href="{{ style.href }}" type="text/css" rel="{{ style.rel }}" media="{{ style.media }}"/>
+    {% elseif style is not iterable %}
+      <link href="{{ style }}" type="text/css" rel="stylesheet" media="screen"/>
+    {% endif %}
+  {% endfor %}
+
+  {% for script in scripts %}
+    {% if script.href is defined %}
+      <script src="{{ script.href }}" type="text/javascript"></script>
+    {% elseif script is not iterable %}
+      <script src="{{ script }}" type="text/javascript"></script>
+    {% endif %}
+  {% endfor %}
+
+  {% for link in links %}
+    <link href="{{ link.href }}" rel="{{ link.rel }}"/>
+  {% endfor %}
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": {{ name|json_encode|raw }},
+    "url": {{ home|replace({'&amp;': '&'})|json_encode|raw }},
+    "creator": {
+      "@type": "Person",
+      "name": "Paweł Nosko",
+      "url": "https://pawelnosko.com",
+      "sameAs": [
+        "https://github.com/pawelnosko",
+        "https://www.linkedin.com/in/pawe%C5%82-nosko-916646363"
+      ]
+    }
+  }
+  </script>
+
+  {% for analytic in analytics %}
+    {{ analytic }}
+  {% endfor %}
+</head>
+<body class="pn-body">
+
+  {# ── Cart drawer ─────────────────────────────────────────────────────── #}
+  <div class="cart-overlay" data-pn-cart-close></div>
+  <aside id="cart-panel" class="cart-panel" role="dialog" aria-modal="true" aria-hidden="true" aria-label="{{ cart_label|e('html_attr') }}">
+    <div class="cart-panel-header">
+      <p class="cart-panel-title">{{ cart_label|e }} (<span class="cart-count-number">0</span>)</p>
+      <button type="button" class="pn-close" data-pn-cart-close aria-label="{{ button_close|default('Close') }}">
+        <svg class="pn-icon" aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m5 5 14 14M19 5 5 19"/></svg>
+      </button>
+    </div>
+    <div class="cart-panel-content">
+      {{ cart }}
+    </div>
+  </aside>
+
+  {# ── Announcement ────────────────────────────────────────────────────── #}
+  {% if header_cfg.top_bar[lid] or language or currency %}
+    <div class="pn-announcement gold-announcement">
+      <p class="pn-announcement-text">{{ header_cfg.top_bar[lid]|default('')|raw }}</p>
+      {% if language or currency %}
+        <div class="pn-utility">
+          {{ language }}
+          {{ currency }}
+        </div>
+      {% endif %}
+    </div>
+  {% endif %}
+
+  {# ── Header ──────────────────────────────────────────────────────────── #}
+  <header class="pn-header" id="pn-header">
+    <div class="pn-header-bar">
+      <button type="button" class="pn-menu-btn" data-pn-menu-open aria-expanded="false" aria-controls="pn-mobile" aria-label="{{ menu_label|e('html_attr') }}">
+        <svg class="pn-icon" aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7h18M3 17h18"/></svg>
+        <span>{{ menu_label|e }}</span>
+      </button>
+
+      <nav class="pn-nav" aria-label="Main navigation">
+        {{ menu }}
+      </nav>
+
+      <a href="{{ home }}" class="pn-brand gold-text font-serif">
+        {% if header_cfg.logo %}
+          <img src="image/{{ header_cfg.logo }}" alt="{{ site_name|e('html_attr') }}" title="{{ site_name|e('html_attr') }}"/>
+        {% elseif header_cfg.brand_text %}
+          {{ header_cfg.brand_text|e }}
+        {% elseif logo %}
+          <img src="{{ logo }}" alt="{{ site_name|e('html_attr') }}" title="{{ site_name|e('html_attr') }}"/>
+        {% else %}
+          {{ name }}
+        {% endif %}
+      </a>
+
+      <div class="pn-actions">
+        <button type="button" class="pn-icon-btn" data-pn-search-toggle aria-expanded="false" aria-controls="pn-search-panel" aria-label="{{ search_label|e('html_attr') }}">
+          <svg class="pn-icon" aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4 4"/></svg>
+        </button>
+
+        <div class="dropdown pn-account pn-icon-btn--md">
+          <button type="button" class="pn-icon-btn" data-bs-toggle="dropdown" aria-expanded="false" aria-label="{{ account_label|e('html_attr') }}" title="{{ account_label|e('html_attr') }}">
+            <svg class="pn-icon" aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4.5 21c.8-4.2 3.3-6.3 7.5-6.3s6.7 2.1 7.5 6.3"/></svg>
+          </button>
+          <ul class="dropdown-menu dropdown-menu-end">
+            {% if logged %}
+              <li><a class="dropdown-item" href="{{ account }}">{{ text_account }}</a></li>
+              <li><a class="dropdown-item" href="{{ order }}">{{ text_order }}</a></li>
+              <li><a class="dropdown-item" href="{{ transaction }}">{{ text_transaction }}</a></li>
+              <li><a class="dropdown-item" href="{{ download }}">{{ text_download }}</a></li>
+              <li><a class="dropdown-item" href="{{ logout }}">{{ text_logout }}</a></li>
+            {% else %}
+              <li><a class="dropdown-item" href="{{ login }}">{{ text_login }}</a></li>
+              <li><a class="dropdown-item" href="{{ register }}">{{ text_register }}</a></li>
+            {% endif %}
+          </ul>
+        </div>
+
+        <a href="{{ wishlist }}" class="pn-icon-btn pn-icon-btn--md" aria-label="{{ text_wishlist|striptags|e('html_attr') }}" title="{{ text_wishlist|striptags|e('html_attr') }}">
+          <svg class="pn-icon" aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20.8 5.8a5.4 5.4 0 0 0-7.7 0L12 6.9l-1.1-1.1a5.4 5.4 0 0 0-7.7 7.7L12 22l8.8-8.5a5.4 5.4 0 0 0 0-7.7Z"/></svg>
+        </a>
+
+        <div class="cart-count-badge-container">
+          <button type="button" class="pn-icon-btn dc-header-action-cart" data-open-cart aria-label="{{ cart_label|e('html_attr') }}">
+            <svg class="pn-icon" aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8h14l-1 13H6L5 8Z"/><path d="M9 9V6a3 3 0 0 1 6 0v3"/></svg>
+          </button>
+          <span class="cart-count-badge" aria-hidden="true">0</span>
+        </div>
+      </div>
+    </div>
+
+    {# Search panel #}
+    <div class="pn-search-panel" id="pn-search-panel">
+      <div class="pn-search-panel-inner">
+        {{ search }}
+      </div>
+    </div>
+
+  </header>
+
+  {# ── Mobile drawer ───────────────────────────────────────────────────── #}
+  <div class="pn-mobile" id="pn-mobile" aria-hidden="true">
+    <aside class="pn-mobile-panel" role="dialog" aria-modal="true" aria-label="{{ menu_label|e('html_attr') }}">
+      <div class="pn-mobile-head">
+        <a href="{{ home }}" class="pn-brand gold-text font-serif">
+          {% if header_cfg.logo %}
+            <img src="image/{{ header_cfg.logo }}" alt="{{ site_name|e('html_attr') }}"/>
+          {% elseif header_cfg.brand_text %}
+            {{ header_cfg.brand_text|e }}
+          {% elseif logo %}
+            <img src="{{ logo }}" alt="{{ site_name|e('html_attr') }}"/>
+          {% else %}
+            {{ name }}
+          {% endif %}
+        </a>
+        <button type="button" class="pn-close" data-pn-menu-close aria-label="{{ button_close|default('Close') }}">
+          <svg class="pn-icon" aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m5 5 14 14M19 5 5 19"/></svg>
+        </button>
+      </div>
+
+      <nav class="pn-mobile-nav" aria-label="Mobile navigation">
+        {{ menu }}
+      </nav>
+
+      <div class="pn-mobile-search">
+        {{ search }}
+      </div>
+
+      <div class="pn-mobile-foot">
+        {% if logged %}
+          <a href="{{ account }}">{{ text_account }}</a>
+          <a href="{{ logout }}">{{ text_logout }}</a>
+        {% else %}
+          <a href="{{ login }}">{{ text_login }}</a>
+          <a href="{{ register }}">{{ text_register }}</a>
+        {% endif %}
+        <a href="{{ wishlist }}">{{ text_wishlist|striptags }}</a>
+      </div>
+    </aside>
+  </div>
+
+  {# ── Feedback modal + alerts ─────────────────────────────────────────── #}
+  <div class="modal fade" id="message-modal" tabindex="-1" aria-labelledby="message-modal-label" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header justify-content-center border-0" id="message-modal-header">
+          <span id="message-modal-icon" class="mx-auto"></span>
+          <button type="button" class="btn-close btn-close-white position-absolute end-0 top-0 m-3" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body text-center" id="message-modal-body"></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="alert"></div>

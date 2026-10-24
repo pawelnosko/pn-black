@@ -1,0 +1,27 @@
+{#
+  Theme Black
+  Author: Paweł Nosko → https://pawelnosko.com/
+  Company: Design Cart → https://www.designcart.pl/
+#}
+{% set lid = pn_black_language_id %}
+{% set cat_cfg = pn_black.category|default({}) %}
+{% set title_words = heading_title|striptags|split(' ') %}
+{% if cat_cfg.title[lid] %}
+  {% set listing_title_html = cat_cfg.title[lid] %}
+{% elseif title_words|length > 1 %}
+  {% set listing_title_html = title_words|slice(0, title_words|length - 1)|join(' ') ~ '<br/><em>' ~ title_words|last ~ '</em>' %}
+{% else %}
+  {% set listing_title_html = 'The<br/><em>collection.</em>' %}
+{% endif %}
+{{ header }}
+{% include 'extension/pn_black/catalog/view/template/product/_listing.twig' with {
+  listing_id: 'product-category',
+  listing_eyebrow: cat_cfg.eyebrow[lid]|default('Edition 01') ~ ' — ' ~ heading_title,
+  listing_title_html: listing_title_html,
+  listing_description: description,
+  listing_image: thumb,
+  show_subcats: true,
+  show_search_form: false,
+  show_hero_media: true
+} %}
+{{ footer }}

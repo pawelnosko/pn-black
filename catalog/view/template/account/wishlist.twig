@@ -1,0 +1,65 @@
+{#
+  Theme Black
+  Author: Paweł Nosko → https://pawelnosko.com/
+  Company: Design Cart → https://www.designcart.pl/
+#}
+{{ header }}
+<div id="account-wishlist" class="pn-account-page">
+  {% include 'extension/pn_black/catalog/view/template/common/breadcrumb.twig' %}
+
+  <div class="pn-account-layout">
+    {{ column_left }}
+
+    <div id="content" class="pn-account-content">
+      {{ content_top }}
+
+      <header class="pn-account-head">
+              <p class="pn-eyebrow gold-text">Account</p>
+              <h1 class="pn-account-title">{{ heading_title }}</h1>
+            </header>
+            <div id="wishlist">{{ list }}</div>
+            <div class="pn-account-actions pn-account-actions--end">
+              <a href="{{ continue }}" class="pn-btn pn-btn--black">{{ button_continue }}</a>
+            </div>
+
+      {{ content_bottom }}
+    </div>
+
+    {{ column_right }}
+  </div>
+</div>
+<script type="text/javascript"><!--
+$('#wishlist').on('click', '.pn-btn--danger, .btn-danger', function(e) {
+    e.preventDefault();
+
+    var element = this;
+
+    $.ajax({
+        url: $(element).attr('href'),
+        dataType: 'json',
+        beforeSend: function() {
+            $(element).button('loading');
+        },
+        complete: function() {
+            $(element).button('reset');
+        },
+        success: function(json) {
+            console.log(json);
+
+            if (json['error']) {
+                $('#alert').prepend('<div class="alert alert-danger alert-dismissible"><i class="fa-solid fa-circle-exclamation"></i> ' + json['error'] + ' <button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>');
+            }
+
+            if (json['success']) {
+                $('#alert').prepend('<div class="alert alert-success alert-dismissible"><i class="fa-solid fa-circle-exclamation"></i> ' + json['success'] + ' <button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>');
+
+                $('#wishlist').load('index.php?route=account/wishlist.list&language={{ language }}&customer_token={{ customer_token }}');
+            }
+        },
+        error: function(xhr, ajaxOptions, thrownError) {
+            console.log(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+        }
+    });
+});
+//--></script>
+{{ footer }}

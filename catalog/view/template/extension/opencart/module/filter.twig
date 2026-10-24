@@ -1,0 +1,46 @@
+{#
+  Theme Black — Filter module
+  Author: Paweł Nosko → https://pawelnosko.com/
+  Company: Design Cart → https://www.designcart.pl/
+#}
+<div class="pn-filters" id="pn-filters">
+  {% for filter_group in filter_groups %}
+    <details class="pn-filter-group" open>
+      <summary class="pn-filter-group__title">
+        <span>{{ filter_group.name }}</span>
+        <span class="pn-filter-group__plus" aria-hidden="true">+</span>
+      </summary>
+      <div class="pn-filter-group__body" id="filter-group-{{ filter_group.filter_group_id }}">
+        {% for filter in filter_group.filter %}
+          <label class="pn-filter-option" for="input-filter-{{ filter.filter_id }}">
+            <input type="checkbox" name="filter[]" value="{{ filter.filter_id }}" id="input-filter-{{ filter.filter_id }}" class="pn-filter-option__input"{% if filter.filter_id in filter_category %} checked{% endif %}/>
+            <span class="pn-filter-option__box" aria-hidden="true"></span>
+            <span class="pn-filter-option__label">{{ filter.name }}</span>
+          </label>
+        {% endfor %}
+      </div>
+    </details>
+  {% endfor %}
+
+  <div class="pn-filter-actions">
+    <button type="button" id="button-filter" class="pn-filter-apply">{{ button_filter|default('Apply filters') }}</button>
+    <a href="{{ action }}" class="pn-filter-clear" id="button-filter-clear">Clear all filters</a>
+  </div>
+</div>
+<script type="text/javascript"><!--
+$('#button-filter').on('click', function () {
+  var filter = [];
+
+  $('#pn-filters input[name^=\'filter\']:checked').each(function () {
+    filter.push(this.value);
+  });
+
+  var url = '{{ action|escape('js') }}';
+
+  if (filter.length) {
+    url += (url.indexOf('?') === -1 ? '?' : '&') + 'filter=' + filter.join(',');
+  }
+
+  location = url;
+});
+//--></script>

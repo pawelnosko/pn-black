@@ -1,0 +1,167 @@
+{#
+  Theme Black
+  Author: Paweł Nosko → https://pawelnosko.com/
+  Company: Design Cart → https://www.designcart.pl/
+#}
+{% set lid = pn_black_language_id %}
+{% set auth = pn_black.account|default({}) %}
+{% set reg = auth.register|default({}) %}
+{{ header }}
+<div id="account-register" class="pn-auth pn-auth--register">
+  {% include 'extension/pn_black/catalog/view/template/common/breadcrumb.twig' %}
+
+  <header class="pn-auth-heading">
+    <p class="pn-eyebrow gold-text">{{ reg.eyebrow[lid]|default('Private access') }}</p>
+    <h1 class="pn-auth-heading__title">{{ reg.title[lid]|default('Join NØR.') }}</h1>
+    <p class="pn-auth-heading__copy">{{ reg.description[lid]|default('Create an account for a faster checkout, order history and a considered edit saved only for you.') }}</p>
+  </header>
+
+  <main class="pn-auth-register">
+    {% if error_warning %}
+      <div class="pn-alert pn-alert--error">{{ error_warning }}</div>
+    {% endif %}
+
+    <form id="form-register" class="pn-auth-form" action="{{ register }}" method="post" data-oc-toggle="ajax">
+      <div class="pn-auth-step">
+        <span class="pn-auth-step__no gold-text">01</span>
+        <span class="pn-auth-step__label">{{ reg.step_details[lid]|default(text_your_details|default('Your details')) }}</span>
+      </div>
+
+      <div class="pn-auth-grid">
+        {% if customer_groups|length > 1 %}
+          <label class="pn-field pn-field--full">
+            <span class="pn-field__label">{{ entry_customer_group }}</span>
+            <select name="customer_group_id" id="input-customer-group" class="pn-field__input pn-field__select">
+              {% for customer_group in customer_groups %}
+                <option value="{{ customer_group.customer_group_id }}"{% if customer_group.customer_group_id == customer_group_id %} selected{% endif %}>{{ customer_group.name }}</option>
+              {% endfor %}
+            </select>
+          </label>
+        {% endif %}
+
+        <label class="pn-field">
+          <span class="pn-field__label">{{ entry_firstname }} <span class="gold-text">*</span></span>
+          <input type="text" name="firstname" value="" placeholder="{{ entry_firstname }}" id="input-firstname" class="pn-field__input" required autocomplete="given-name"/>
+          <div id="error-firstname" class="pn-field__error"></div>
+        </label>
+
+        <label class="pn-field">
+          <span class="pn-field__label">{{ entry_lastname }} <span class="gold-text">*</span></span>
+          <input type="text" name="lastname" value="" placeholder="{{ entry_lastname }}" id="input-lastname" class="pn-field__input" required autocomplete="family-name"/>
+          <div id="error-lastname" class="pn-field__error"></div>
+        </label>
+
+        <label class="pn-field">
+          <span class="pn-field__label">{{ entry_email }} <span class="gold-text">*</span></span>
+          <input type="email" name="email" value="" placeholder="{{ entry_email }}" id="input-email" class="pn-field__input" required autocomplete="email"/>
+          <div id="error-email" class="pn-field__error"></div>
+        </label>
+
+        {% if config_telephone_display %}
+          <label class="pn-field">
+            <span class="pn-field__label">{{ entry_telephone }}{% if config_telephone_required %} <span class="gold-text">*</span>{% endif %}</span>
+            <input type="tel" name="telephone" value="" placeholder="{{ entry_telephone }}" id="input-telephone" class="pn-field__input"{% if config_telephone_required %} required{% endif %} autocomplete="tel"/>
+            <div id="error-telephone" class="pn-field__error"></div>
+          </label>
+        {% endif %}
+
+        {% for custom_field in custom_fields %}
+          {% if custom_field.type == 'select' %}
+            <label class="pn-field pn-field--full custom-field custom-field-{{ custom_field.custom_field_id }}">
+              <span class="pn-field__label">{{ custom_field.name }}</span>
+              <select name="custom_field[{{ custom_field.custom_field_id }}]" id="input-custom-field-{{ custom_field.custom_field_id }}" class="pn-field__input pn-field__select">
+                <option value="">{{ text_select }}</option>
+                {% for custom_field_value in custom_field.custom_field_value %}
+                  <option value="{{ custom_field_value.custom_field_value_id }}">{{ custom_field_value.name }}</option>
+                {% endfor %}
+              </select>
+              <div id="error-custom-field-{{ custom_field.custom_field_id }}" class="pn-field__error"></div>
+            </label>
+          {% elseif custom_field.type == 'text' %}
+            <label class="pn-field pn-field--full custom-field custom-field-{{ custom_field.custom_field_id }}">
+              <span class="pn-field__label">{{ custom_field.name }}</span>
+              <input type="text" name="custom_field[{{ custom_field.custom_field_id }}]" value="{{ custom_field.value }}" placeholder="{{ custom_field.name }}" id="input-custom-field-{{ custom_field.custom_field_id }}" class="pn-field__input"/>
+              <div id="error-custom-field-{{ custom_field.custom_field_id }}" class="pn-field__error"></div>
+            </label>
+          {% elseif custom_field.type == 'textarea' %}
+            <label class="pn-field pn-field--full custom-field custom-field-{{ custom_field.custom_field_id }}">
+              <span class="pn-field__label">{{ custom_field.name }}</span>
+              <textarea name="custom_field[{{ custom_field.custom_field_id }}]" rows="4" placeholder="{{ custom_field.name }}" id="input-custom-field-{{ custom_field.custom_field_id }}" class="pn-field__input">{{ custom_field.value }}</textarea>
+              <div id="error-custom-field-{{ custom_field.custom_field_id }}" class="pn-field__error"></div>
+            </label>
+          {% endif %}
+        {% endfor %}
+      </div>
+
+      <div class="pn-auth-step">
+        <span class="pn-auth-step__no gold-text">02</span>
+        <span class="pn-auth-step__label">{{ reg.step_password[lid]|default(text_your_password|default('Your password')) }}</span>
+      </div>
+
+      <div class="pn-auth-grid">
+        <label class="pn-field">
+          <span class="pn-field__label">
+            <span>{{ entry_password }} <span class="gold-text">*</span></span>
+            <span class="pn-field__hint">{{ reg.password_hint[lid]|default('Minimum 8 characters') }}</span>
+          </span>
+          <input type="password" name="password" value="" placeholder="{{ entry_password }}" id="input-password" class="pn-field__input" required autocomplete="new-password"/>
+          <div id="error-password" class="pn-field__error"></div>
+        </label>
+      </div>
+
+      <div class="pn-auth-step">
+        <span class="pn-auth-step__no gold-text">03</span>
+        <span class="pn-auth-step__label">{{ reg.step_preferences[lid]|default(text_newsletter|default('Preferences')) }}</span>
+      </div>
+
+      <div class="pn-auth-checks">
+        <label class="pn-check">
+          <input type="hidden" name="newsletter" value="0"/>
+          <input type="checkbox" name="newsletter" value="1" id="input-newsletter" class="pn-check__input"/>
+          <span class="pn-check__box" aria-hidden="true"></span>
+          <span class="pn-check__label">{{ reg.newsletter_label[lid]|default(entry_newsletter|default('I would like to receive private collection previews and journal stories.')) }}</span>
+        </label>
+
+        {% if text_agree %}
+          <label class="pn-check">
+            <input type="checkbox" name="agree" value="1" class="pn-check__input" required/>
+            <span class="pn-check__box" aria-hidden="true"></span>
+            <span class="pn-check__label">{{ text_agree }}</span>
+          </label>
+        {% endif %}
+      </div>
+
+      {{ captcha }}
+
+      <div class="pn-auth-actions">
+        <p class="pn-auth-foot pn-auth-foot--inline">
+          {{ reg.login_prompt[lid]|default(text_account_already|default('Already registered?')) }}
+          <a href="{{ login }}" class="pn-auth-link pn-auth-link--strong">{{ reg.login_label[lid]|default(text_login|default('Sign in')) }}</a>
+        </p>
+        <button type="submit" class="pn-btn pn-btn--black pn-auth-submit">
+          {{ reg.button[lid]|default(button_continue|default('Create account')) }}
+          <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h16M14 6l6 6-6 6"/></svg>
+        </button>
+      </div>
+    </form>
+  </main>
+</div>
+<script type="text/javascript"><!--
+$('#input-customer-group').on('change', function () {
+  $.ajax({
+    url: 'index.php?route=account/custom_field&customer_group_id=' + this.value + '&language={{ language }}',
+    dataType: 'json',
+    success: function (json) {
+      $('.custom-field').hide().removeClass('required');
+      for (var i = 0; i < json.length; i++) {
+        var custom_field = json[i];
+        $('.custom-field-' + custom_field['custom_field_id']).show();
+        if (custom_field['required']) {
+          $('.custom-field-' + custom_field['custom_field_id']).addClass('required');
+        }
+      }
+    }
+  });
+}).trigger('change');
+//--></script>
+{{ footer }}

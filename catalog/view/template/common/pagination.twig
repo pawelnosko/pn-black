@@ -1,0 +1,22 @@
+<!--
+  Theme Black
+  Author: Paweł Nosko → https://pawelnosko.com/
+  Company: Design Cart → https://www.designcart.pl/
+-->
+<nav class="pn-pagination" aria-label="Pagination">
+  <ul class="pn-pagination-list pagination">
+    {% if prev %}
+      <li><a href="{{ prev }}" class="pn-pagination-btn" aria-label="Previous">‹</a></li>
+    {% endif %}
+    {% for link in links %}
+      {% if link.page == page %}
+        <li><span class="pn-pagination-btn is-active" aria-current="page">{{ link.page }}</span></li>
+      {% else %}
+        <li><a href="{{ link.href }}" class="pn-pagination-btn">{{ link.page }}</a></li>
+      {% endif %}
+    {% endfor %}
+    {% if next %}
+      <li><a href="{{ next }}" class="pn-pagination-btn" aria-label="Next">›</a></li>
+    {% endif %}
+  </ul>
+</nav>

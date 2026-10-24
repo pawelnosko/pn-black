@@ -1,0 +1,184 @@
+{#
+  Theme Black
+  Author: Paweł Nosko → https://pawelnosko.com/
+  Company: Design Cart → https://www.designcart.pl/
+#}
+<div class="pn-comments-actions">
+  {% if logged %}
+    <button type="button" value="{{ like }}" data-bs-toggle="tooltip" title="{{ button_like }}" data-oc-toggle="rate" class="pn-btn pn-btn--outline"><i class="fa fa-thumbs-up"></i></button>
+    <button type="button" value="{{ dislike }}" data-bs-toggle="tooltip" title="{{ button_dislike }}" data-oc-toggle="rate" class="pn-btn pn-btn--outline"><i class="fa fa-thumbs-down"></i></button>
+    <button type="button" value="{{ comment_add }}" data-oc-toggle="comment" data-oc-target="#comment-0" data-oc-trigger="#button-refresh" class="pn-btn pn-btn--black">{{ button_comment }}</button>
+  {% else %}
+    <a href="{{ login }}" class="pn-btn pn-btn--outline"><i class="fa fa-thumbs-up"></i></a>
+    <a href="{{ login }}" class="pn-btn pn-btn--outline"><i class="fa fa-thumbs-down"></i></a>
+    <a href="{{ login }}" class="pn-btn pn-btn--black">{{ button_login }}</a>
+  {% endif %}
+</div>
+
+<div class="pn-comments-head">
+  <h2>{{ heading_title }}</h2>
+  <label class="pn-field pn-comments-sort">
+    <span class="pn-field__label">{{ text_sort }}</span>
+    <span class="pn-field__select-wrap">
+      <select id="input-sort" class="pn-field__input pn-field__select">
+        {% for sorts in sorts %}
+          <option value="{{ sorts.href }}"{% if sorts.value == '%s-%s'|format(sort, order) %} selected{% endif %}>{{ sorts.text }}</option>
+        {% endfor %}
+      </select>
+    </span>
+  </label>
+</div>
+
+<div id="comment">{{ list }}</div>
+
+<div id="modal-comment" class="modal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">{{ text_write }}</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <form id="form-comment" action="" data-oc-target="" data-oc-trigger="">
+          <label class="pn-field">
+            <span class="pn-field__label">{{ entry_author }} <span class="gold-text">*</span></span>
+            <input type="text" name="author" value="{{ author }}" placeholder="{{ entry_author }}" id="input-author" class="pn-field__input form-control"/>
+            <div id="error-author" class="pn-field__error invalid-feedback"></div>
+          </label>
+          <label class="pn-field">
+            <span class="pn-field__label">{{ entry_comment }} <span class="gold-text">*</span></span>
+            <textarea name="comment" rows="5" placeholder="{{ entry_comment }}" id="input-comment" class="pn-field__input form-control">{{ comment }}</textarea>
+            <div id="error-comment" class="pn-field__error invalid-feedback"></div>
+          </label>
+          {{ captcha }}
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="submit" id="button-comment" form="form-comment" class="pn-btn pn-btn--black">{{ button_comment }}</button>
+      </div>
+    </div>
+  </div>
+</div>
+<script type="text/javascript"><!--
+$('#comment').on('click', '.pagination a', function(e) {
+    e.preventDefault();
+    $('#comment').load(this.href);
+});
+
+$('#input-sort').on('change', function(e) {
+    $('#comment').load($(this).val());
+});
+
+$('#cms-blog').on('click', '[data-oc-toggle=\'comment\']', function(e) {
+    e.preventDefault();
+    var element = this;
+    $('#form-comment').attr('action', $(element).val());
+    $('#form-comment').attr('data-oc-target', $(element).attr('data-oc-target'));
+    $('#form-comment').attr('data-oc-trigger', $(element).attr('data-oc-trigger'));
+    $('#modal-comment').modal('show');
+});
+
+$('#form-comment').on('submit', function(e) {
+    e.preventDefault();
+    var element = this;
+    $.ajax({
+        url: $(element).attr('action'),
+        type: 'post',
+        data: $(element).serialize(),
+        dataType: 'json',
+        cache: false,
+        contentType: 'application/x-www-form-urlencoded',
+        processData: false,
+        beforeSend: function() {
+            $('#button-comment').button('loading');
+        },
+        complete: function() {
+            $('#button-comment').button('reset');
+        },
+        success: function(json) {
+            $('.alert-dismissible').remove();
+            $('#form-comment').find('.is-invalid').removeClass('is-invalid');
+            $('#form-comment').find('.invalid-feedback').removeClass('d-block');
+
+            if (json['error']) {
+                if (json['error']['warning']) {
+                    $('#modal-comment .modal-body').prepend('<div class="alert alert-danger alert-dismissible"><i class="fa-solid fa-circle-exclamation"></i> ' + json['error']['warning'] + ' <button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>');
+                }
+                for (key in json['error']) {
+                    $('#input-' + key.replaceAll('_', '-')).addClass('is-invalid').find('.form-control, .form-select, .form-check-input, .form-check-label').addClass('is-invalid');
+                    $('#error-' + key.replaceAll('_', '-')).html(json['error'][key]).addClass('d-block');
+                }
+            }
+
+            if (json['success']) {
+                $('#modal-comment .modal-body').prepend('<div class="alert alert-success alert-dismissible"><i class="fa-solid fa-circle-exclamation"></i> ' + json['success'] + ' <button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>');
+                $('#input-comment').val('');
+                $($('#form-comment').attr('data-oc-trigger')).trigger('click');
+            }
+        },
+        error: function(xhr, ajaxOptions, thrownError) {
+            console.log(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+        }
+    });
+});
+
+$('#comment').on('click', '[data-oc-toggle=\'next\']', function(e) {
+    e.preventDefault();
+    var element = this;
+    $.ajax({
+        url: $(element).val(),
+        dataType: 'html',
+        beforeSend: function() { $(element).button('loading'); },
+        complete: function() { $(element).button('reset'); },
+        success: function(html) {
+            $(element).parent().before(html);
+            $(element).parent().remove();
+        },
+        error: function(xhr, ajaxOptions, thrownError) {
+            console.log(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+        }
+    });
+});
+
+$('#comment').on('click', '[data-oc-toggle=\'refresh\']', function(e) {
+    e.preventDefault();
+    var element = this;
+    $.ajax({
+        url: $(element).val(),
+        dataType: 'html',
+        beforeSend: function() { $(element).button('loading'); },
+        complete: function() { $(element).button('reset'); },
+        success: function(html) {
+            $($(element).attr('data-oc-target')).remove();
+            $(element).parent().before(html);
+            $(element).parent().remove();
+        },
+        error: function(xhr, ajaxOptions, thrownError) {
+            console.log(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+        }
+    });
+});
+
+$('#comment-container').on('click', '[data-oc-toggle=\'rate\']', function(e) {
+    e.preventDefault();
+    var element = this;
+    $.ajax({
+        url: $(element).val(),
+        dataType: 'json',
+        beforeSend: function() { $(element).button('loading'); },
+        complete: function() { $(element).button('reset'); },
+        success: function(json) {
+            $('.alert-dismissible').remove();
+            if (json['error']) {
+                $('#alert').prepend('<div class="alert alert-danger alert-dismissible"><i class="fa-solid fa-circle-exclamation"></i> ' + json['error'] + ' <button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>');
+            }
+            if (json['success']) {
+                $('#alert').prepend('<div class="alert alert-success alert-dismissible"><i class="fa-solid fa-circle-exclamation"></i> ' + json['success'] + ' <button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>');
+            }
+        },
+        error: function(xhr, ajaxOptions, thrownError) {
+            console.log(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+        }
+    });
+});
+//--></script>

@@ -1,0 +1,8 @@
+Theme Black — default demo images
+Author: Paweł Nosko / Design Cart / https://www.designcart.pl
+
+hero-1.jpg     — Banner slide 1 (toys)
+hero-2.jpg     — Banner slide 2 (games)
+hero-3.jpg     — Banner slide 3 (sale)
+about.jpg      — About Us section
+logo_toys.png  — Header / footer / store logo

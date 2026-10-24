@@ -1,0 +1,59 @@
+{#
+  Theme Black
+  Author: Paweł Nosko → https://pawelnosko.com/
+  Company: Design Cart → https://www.designcart.pl/
+#}
+{{ header }}
+<div id="account-transaction" class="pn-account-page">
+  {% include 'extension/pn_black/catalog/view/template/common/breadcrumb.twig' %}
+
+  <div class="pn-account-layout">
+    {{ column_left }}
+
+    <div id="content" class="pn-account-content">
+      {{ content_top }}
+
+      <header class="pn-account-head">
+              <p class="pn-eyebrow gold-text">Account</p>
+              <h1 class="pn-account-title">{{ heading_title }}</h1>
+            </header>
+            <p>{{ text_total }} <b>{{ total }}</b>.</p>
+            <table class="table table-bordered table-hover">
+              <thead>
+                <tr>
+                  <th>{{ column_date_added }}</th>
+                  <th>{{ column_description }}</th>
+                  <th class="text-end">{{ column_amount }}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% if transactions %}
+                  {% for transaction in transactions %}
+                    <tr>
+                      <td>{{ transaction.date_added }}</td>
+                      <td>{{ transaction.description }}</td>
+                      <td class="text-end">{{ transaction.amount }}</td>
+                    </tr>
+                  {% endfor %}
+                {% else %}
+                  <tr>
+                    <td class="text-center" colspan="3">{{ text_no_results }}</td>
+                  </tr>
+                {% endif %}
+              </tbody>
+            </table>
+            <div class="pn-account-foot">
+              <div class="pn-pagination-wrap">{{ pagination }}</div>
+              <p class="pn-account-results">{{ results }}</p>
+            </div>
+            <div class="pn-account-actions pn-account-actions--end">
+              <a href="{{ continue }}" class="pn-btn pn-btn--black">{{ button_continue }}</a>
+            </div>
+
+      {{ content_bottom }}
+    </div>
+
+    {{ column_right }}
+  </div>
+</div>
+{{ footer }}

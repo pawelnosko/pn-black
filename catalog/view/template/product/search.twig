@@ -1,0 +1,19 @@
+{#
+  Theme Black
+  Author: Paweł Nosko → https://pawelnosko.com/
+  Company: Design Cart → https://www.designcart.pl/
+#}
+{% set lid = pn_black_language_id %}
+{% set list_cfg = pn_black.category|default({}) %}
+{{ header }}
+{% include 'extension/pn_black/catalog/view/template/product/_listing.twig' with {
+  listing_id: 'product-search',
+  listing_eyebrow: list_cfg.eyebrow[lid]|default('Edition 01') ~ ' — ' ~ heading_title,
+  listing_title_html: heading_title,
+  listing_description: '<p>' ~ (text_search|default('Refine your search across the collection.')) ~ '</p>',
+  listing_image: 'catalog/pn_black/white-dress.jpg',
+  show_subcats: false,
+  show_search_form: true,
+  show_hero_media: true
+} %}
+{{ footer }}

@@ -1,0 +1,55 @@
+{#
+  Theme Black
+  Author: Paweł Nosko → https://pawelnosko.com/
+  Company: Design Cart → https://www.designcart.pl/
+#}
+{{ header }}
+<div id="cms-blog" class="pn-article">
+  {% include 'extension/pn_black/catalog/view/template/common/breadcrumb.twig' %}
+
+  <div class="pn-article-shell">
+    <div id="content" class="pn-article-main">
+      {{ content_top }}
+
+      <header class="pn-article-head">
+        <p class="pn-eyebrow gold-text">Journal</p>
+        <h1 class="pn-article-title">{{ heading_title }}</h1>
+        <p class="pn-article-meta">
+          <span>{{ text_by }} <a href="{{ filter_author }}">{{ author }}</a></span>
+          <span aria-hidden="true">·</span>
+          <time>{{ date_added }}</time>
+          {% if comment_total is defined %}
+            <span aria-hidden="true">·</span>
+            <span>{{ comment_total }} {{ text_comment }}</span>
+          {% endif %}
+        </p>
+      </header>
+
+      {% if image %}
+        <figure class="pn-article-media">
+          <img src="{{ image }}" alt="{{ heading_title|e('html_attr') }}" loading="lazy"/>
+        </figure>
+      {% endif %}
+
+      <article class="pn-prose pn-article-body">
+        {{ description }}
+      </article>
+
+      {% if tags %}
+        <p class="pn-article-tags">
+          <span class="pn-article-tags__label">{{ text_tags }}</span>
+          {% for tag in tags %}
+            <a href="{{ tag.href }}">{{ tag.tag }}</a>{% if not loop.last %}<span aria-hidden="true">,</span>{% endif %}
+          {% endfor %}
+        </p>
+      {% endif %}
+
+      {% if comment %}
+        <div id="comment-container" class="pn-article-comments">{{ comment }}</div>
+      {% endif %}
+
+      {{ content_bottom }}
+    </div>
+  </div>
+</div>
+{{ footer }}
